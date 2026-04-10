@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -12,34 +12,20 @@
         --card-foreground: 222 47% 11%;
         --popover: 0 0% 100%;
         --popover-foreground: 222 47% 11%;
-        --primary: 243 75% 59%;
+        --primary: 217 91% 60%;
         --primary-foreground: 0 0% 100%;
-        --secondary: 217 91% 60%;
+        --secondary: 222 47% 11%;
         --secondary-foreground: 0 0% 100%;
         --muted: 210 40% 96%;
         --muted-foreground: 215 16% 47%;
-        --accent: 243 75% 97%;
-        --accent-foreground: 243 75% 59%;
+        --accent: 217 91% 97%;
+        --accent-foreground: 217 91% 60%;
         --destructive: 0 84% 60%;
         --destructive-foreground: 0 0% 98%;
         --border: 214 32% 91%;
         --input: 214 32% 91%;
-        --ring: 243 75% 59%;
+        --ring: 217 91% 60%;
         --radius: 0.75rem;
-        
-        /* Custom colors */
-        --indigo-600: 243 75% 59%;
-        --indigo-700: 244 55% 41%;
-        --slate-50: 210 40% 98%;
-        --slate-100: 210 40% 96%;
-        --slate-200: 214 32% 91%;
-        --slate-300: 213 27% 84%;
-        --slate-400: 215 20% 65%;
-        --slate-500: 215 16% 47%;
-        --slate-600: 215 19% 35%;
-        --slate-700: 215 25% 27%;
-        --slate-800: 217 33% 17%;
-        --slate-900: 222 47% 11%;
     }
 }
 
@@ -54,106 +40,94 @@
     
     body {
         @apply bg-white text-slate-900;
-        font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
     
     h1, h2, h3, h4, h5, h6 {
-        font-family: 'Outfit', sans-serif;
+        font-family: 'IBM Plex Sans', sans-serif;
+        font-weight: 700;
     }
     
     code, pre, .font-mono {
-        font-family: 'JetBrains Mono', monospace;
+        font-family: 'IBM Plex Mono', monospace;
     }
 }
 
 @layer components {
-    /* Button styles with advanced hover effects */
+    /* Primary Button - Medical Blue */
     .btn-primary {
-        @apply bg-indigo-600 text-white font-semibold rounded-lg shadow-sm 
-               hover:bg-indigo-700 hover:shadow-[0_0_20px_rgba(67,56,202,0.3)] 
-               transition-all duration-300 px-6 py-3 
-               focus:ring-2 focus:ring-indigo-500/20 focus:outline-none
-               relative overflow-hidden;
+        @apply inline-flex items-center justify-center bg-blue-600 text-white font-semibold rounded-lg px-6 py-3 
+               hover:bg-blue-700 transition-all duration-200 shadow-sm 
+               focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none;
     }
     
-    .btn-primary::before {
-        content: '';
-        @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent
-               translate-x-[-100%] transition-transform duration-500;
-    }
-    
-    .btn-primary:hover::before {
-        @apply translate-x-[100%];
-    }
-    
+    /* Secondary Button - Dark */
     .btn-secondary {
-        @apply bg-white text-slate-700 font-medium border border-slate-200 rounded-lg 
-               hover:border-indigo-300 hover:bg-slate-50 hover:text-indigo-700 
-               transition-all duration-300 px-6 py-3
-               focus:ring-2 focus:ring-indigo-500/20 focus:outline-none;
+        @apply inline-flex items-center justify-center bg-slate-900 text-white font-semibold rounded-lg px-6 py-3 
+               hover:bg-slate-800 transition-all duration-200 shadow-sm 
+               focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 focus:outline-none;
     }
     
-    .btn-ghost {
-        @apply text-slate-600 font-medium hover:bg-slate-100 hover:text-slate-900 
-               rounded-lg transition-colors px-4 py-2;
+    /* Outline Button */
+    .btn-outline {
+        @apply inline-flex items-center justify-center border-2 border-slate-200 bg-transparent text-slate-900 
+               font-semibold rounded-lg px-6 py-3 
+               hover:border-blue-600 hover:text-blue-600 transition-all duration-200 focus:outline-none;
     }
     
-    /* Card styles */
-    .card-default {
-        @apply bg-white rounded-xl border border-slate-200 shadow-sm;
+    /* Dashboard Widget Card */
+    .card-widget {
+        @apply bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-shadow;
     }
     
-    .card-interactive {
-        @apply bg-white rounded-xl border border-slate-200 shadow-sm 
-               hover:-translate-y-1 hover:shadow-md hover:border-indigo-200 
-               transition-all duration-300;
+    /* Bento Marketing Card */
+    .card-bento {
+        @apply bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden relative;
     }
     
-    .card-glass {
-        @apply bg-white/70 backdrop-blur-xl border border-white/40 
-               shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-xl;
+    /* Glass Header */
+    .glass-header {
+        @apply sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-slate-200 shadow-sm;
     }
     
-    /* Input styles */
-    .input-default {
-        @apply w-full bg-white border border-slate-300 text-slate-900 rounded-lg px-4 py-2 
-               focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 
+    /* File Upload Zone */
+    .upload-zone {
+        @apply relative border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 p-8 text-center 
+               hover:bg-blue-50 hover:border-blue-400 transition-colors cursor-pointer;
+    }
+    
+    .upload-zone.dragover {
+        @apply bg-blue-50 border-blue-500;
+    }
+    
+    /* Input Styles */
+    .input-field {
+        @apply w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 
+               placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 
                transition-all outline-none;
     }
     
-    .textarea-mono {
-        @apply w-full bg-slate-50 border border-slate-200 font-mono text-sm text-slate-800 
-               rounded-lg p-4 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 
-               transition-all shadow-inner outline-none resize-none;
+    .textarea-field {
+        @apply w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 
+               placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 
+               transition-all outline-none resize-none;
     }
     
-    /* Glassmorphism header */
-    .glass-header {
-        @apply bg-white/80 backdrop-blur-xl border-b border-slate-200/50;
+    /* Output Display */
+    .output-container {
+        @apply bg-slate-900 rounded-xl p-6 shadow-inner relative overflow-hidden;
     }
     
-    /* Glow effects */
-    .glow-indigo {
-        box-shadow: 0 0 30px rgba(67, 56, 202, 0.15);
-    }
-    
-    /* Skeleton loading */
-    .skeleton-pulse {
-        @apply animate-pulse bg-gradient-to-r from-slate-100 via-slate-200 to-slate-100;
-        background-size: 200% 100%;
-        animation: skeleton-loading 1.5s ease-in-out infinite;
-    }
-    
-    @keyframes skeleton-loading {
-        0% { background-position: 200% 0; }
-        100% { background-position: -200% 0; }
+    .output-text {
+        @apply font-mono text-sm text-emerald-400 leading-relaxed;
     }
     
     /* Fade up animation */
     .fade-up {
         animation: fadeUp 0.6s ease-out forwards;
+        opacity: 0;
     }
     
     @keyframes fadeUp {
@@ -174,23 +148,36 @@
     .delay-400 { animation-delay: 400ms; }
     .delay-500 { animation-delay: 500ms; }
     
-    /* Tooltip styles */
-    .tooltip-content {
-        @apply bg-slate-900 text-white text-sm px-3 py-1.5 rounded-md shadow-lg;
-    }
-}
-
-@layer utilities {
-    .text-gradient {
-        @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-blue-500;
+    /* Format badges */
+    .format-badge {
+        @apply px-2 py-1 bg-white border border-slate-200 rounded text-xs font-mono text-slate-600 shadow-sm;
     }
     
+    /* Overline text */
+    .overline {
+        @apply text-xs font-bold uppercase tracking-[0.2em] text-blue-600;
+    }
+    
+    /* Container */
     .container-app {
         @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
     }
     
+    /* Section padding */
     .section-padding {
         @apply py-24 md:py-32;
+    }
+    
+    /* Radial gradient background */
+    .bg-gradient-radial {
+        background: radial-gradient(ellipse at top right, #EFF6FF 0%, #FFFFFF 50%, #FFFFFF 100%);
+    }
+    
+    /* Medical mesh pattern */
+    .bg-medical-mesh {
+        background-image: 
+            radial-gradient(circle at 25% 25%, rgba(37, 99, 235, 0.03) 0%, transparent 50%),
+            radial-gradient(circle at 75% 75%, rgba(37, 99, 235, 0.03) 0%, transparent 50%);
     }
 }
 
@@ -214,5 +201,15 @@
 
 /* Selection color */
 ::selection {
-    @apply bg-indigo-100 text-indigo-900;
+    @apply bg-blue-100 text-blue-900;
+}
+
+/* Pulse animation for loading */
+@keyframes pulse-blue {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.animate-pulse-blue {
+    animation: pulse-blue 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

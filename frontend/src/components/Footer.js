@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Beaker, Github, Twitter, Linkedin, Mail } from 'lucide-react';
+import { Network, Github, Linkedin, Mail } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -10,41 +10,33 @@ const Footer = () => {
           {/* Brand */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-blue-500 flex items-center justify-center">
-                <Beaker className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center">
+                <Network className="w-6 h-6 text-white" strokeWidth={2} />
               </div>
-              <span className="font-bold text-xl">
-                DrugBank <span className="text-indigo-400">KG-to-Text</span>
+              <span className="font-black text-xl tracking-tight">
+                BioKG <span className="text-blue-400">Text AI</span>
               </span>
             </div>
-            <p className="text-slate-400 max-w-md mb-6">
-              Transform biomedical knowledge graphs into natural language with our AI-powered platform. 
-              Built for researchers, clinicians, and pharmaceutical professionals.
+            <p className="text-slate-400 max-w-md mb-6 leading-relaxed">
+              Advanced biomedical knowledge graph transformation platform. 
+              Converting structured pharmaceutical data into actionable clinical insights 
+              through state-of-the-art natural language processing.
             </p>
             <div className="flex items-center gap-4">
               <a 
                 href="https://github.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-slate-700 transition-colors"
+                className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-blue-600 transition-colors"
                 aria-label="GitHub"
               >
                 <Github className="w-5 h-5" />
               </a>
               <a 
-                href="https://twitter.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-slate-700 transition-colors"
-                aria-label="Twitter"
-              >
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a 
                 href="https://linkedin.com" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-slate-700 transition-colors"
+                className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-blue-600 transition-colors"
                 aria-label="LinkedIn"
               >
                 <Linkedin className="w-5 h-5" />
@@ -54,7 +46,7 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold text-lg mb-4">Quick Links</h4>
+            <h4 className="font-bold text-lg mb-4">Platform</h4>
             <ul className="space-y-3">
               <li>
                 <Link to="/" className="text-slate-400 hover:text-white transition-colors">
@@ -63,7 +55,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link to="/demo" className="text-slate-400 hover:text-white transition-colors">
-                  Try Demo
+                  Generate Text
                 </Link>
               </li>
               <li>
@@ -73,7 +65,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link to="/register" className="text-slate-400 hover:text-white transition-colors">
-                  Get Started
+                  Create Account
                 </Link>
               </li>
             </ul>
@@ -81,16 +73,16 @@ const Footer = () => {
 
           {/* Contact */}
           <div>
-            <h4 className="font-semibold text-lg mb-4">Contact</h4>
+            <h4 className="font-bold text-lg mb-4">Contact</h4>
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-slate-400">
                 <Mail className="w-4 h-4" />
-                support@drugbank-kg.ai
+                research@biokg-ai.com
               </li>
             </ul>
             <div className="mt-6">
               <p className="text-sm text-slate-500">
-                Powered by fine-tuned Gemma model on DrugBank knowledge graph data.
+                Enterprise-grade NLP for pharmaceutical research and clinical documentation.
               </p>
             </div>
           </div>
@@ -98,10 +90,10 @@ const Footer = () => {
 
         <div className="border-t border-slate-800 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-slate-500 text-sm">
-            © {new Date().getFullYear()} DrugBank KG-to-Text AI Platform. All rights reserved.
+            © {new Date().getFullYear()} BioKG Text AI. All rights reserved.
           </p>
           <p className="text-slate-500 text-sm">
-            Built with Gemma 2B • Fine-tuned on DrugBank
+            Powered by Advanced Language Models • Research Grade Infrastructure
           </p>
         </div>
       </div>
