@@ -27,7 +27,9 @@ const AdminDashboard = () => {
       setUsers(usersData.users || []);
       setHealth(healthData);
     } catch (error) {
-      toast.error('Failed to load data');
+      console.error('getMyGenerations failed:', error.response?.status, error.response?.data);
+      toast.error(error.response?.data?.detail || 'Failed to load');
+
     } finally {
       setLoading(false);
     }

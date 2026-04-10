@@ -79,4 +79,9 @@ agenthub/agents/youtube/db
 memory/test_credentials.md
 
 # Mobile development
-android-sdk/
+android-sdk/frontend.zip
+backend.zip
+backend/venv/lib/python3.11/site-packages/torch/lib/libtorch_cpu.dylib
+backend
+copy.zip
+frontend.zip

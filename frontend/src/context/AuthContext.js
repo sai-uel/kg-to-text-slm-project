@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+const API_URL = process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:8000';
 
 const AuthContext = createContext(null);
 
@@ -13,12 +13,15 @@ export const useAuth = () => {
   return context;
 };
 
-// Helper to format API error details
 const formatApiErrorDetail = (detail) => {
   if (detail == null) return "Something went wrong. Please try again.";
   if (typeof detail === "string") return detail;
-  if (Array.isArray(detail))
-    return detail.map((e) => (e && typeof e.msg === "string" ? e.msg : JSON.stringify(e))).filter(Boolean).join(" ");
+  if (Array.isArray(detail)) {
+    return detail
+      .map((e) => (e && typeof e.msg === "string" ? e.msg : JSON.stringify(e)))
+      .filter(Boolean)
+      .join(" ");
+  }
   if (detail && typeof detail.msg === "string") return detail.msg;
   return String(detail);
 };
@@ -32,22 +35,17 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const checkAuth = async () => {
-    try {
-      const token = localStorage.getItem('access_token');
-      if (token) {
-        const response = await axios.get(`${API_URL}/api/auth/me`, {
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true
-        });
-        setUser(response.data);
-      }
-    } catch (error) {
-      localStorage.removeItem('access_token');
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    const response = await axios.get(`${API_URL}/api/auth/me`, {
+      withCredentials: true
+    });
+    setUser(response.data);
+  } catch (error) {
+    setUser(null);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const login = async (email, password) => {
     try {
@@ -56,14 +54,14 @@ export const AuthProvider = ({ children }) => {
         { email, password },
         { withCredentials: true }
       );
+
       const { access_token, ...userData } = response.data;
-      localStorage.setItem('access_token', access_token);
       setUser(userData);
       return { success: true };
     } catch (error) {
-      return { 
-        success: false, 
-        error: formatApiErrorDetail(error.response?.data?.detail) || error.message 
+      return {
+        success: false,
+        error: formatApiErrorDetail(error.response?.data?.detail) || error.message
       };
     }
   };
@@ -75,14 +73,14 @@ export const AuthProvider = ({ children }) => {
         { name, email, password },
         { withCredentials: true }
       );
+
       const { access_token, ...userData } = response.data;
-      localStorage.setItem('access_token', access_token);
       setUser(userData);
       return { success: true };
     } catch (error) {
-      return { 
-        success: false, 
-        error: formatApiErrorDetail(error.response?.data?.detail) || error.message 
+      return {
+        success: false,
+        error: formatApiErrorDetail(error.response?.data?.detail) || error.message
       };
     }
   };
@@ -91,24 +89,22 @@ export const AuthProvider = ({ children }) => {
     try {
       await axios.post(`${API_URL}/api/auth/logout`, {}, { withCredentials: true });
     } catch (error) {
-      // Ignore logout errors
     }
-    localStorage.removeItem('access_token');
     setUser(null);
   };
 
-  const value = {
-    user,
-    loading,
-    login,
-    register,
-    logout,
-    isAuthenticated: !!user,
-    isAdmin: user?.is_admin || false
-  };
-
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        login,
+        register,
+        logout,
+        isAuthenticated: !!user,
+        isAdmin: user?.is_admin || false
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

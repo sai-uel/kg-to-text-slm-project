@@ -7,7 +7,7 @@ import requests
 import os
 import time
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://drugbank-kg-text.preview.emergentagent.com')
+BASE_URL = os.environ.get("BASE_URL", "http://localhost:8000")
 
 # Test credentials from test_credentials.md
 ADMIN_EMAIL = "drugbankkgtotext@uel.com"

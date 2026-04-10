@@ -27,7 +27,7 @@ const RegisterPage = () => {
     
     if (result.success) {
       toast.success('Account created');
-      navigate('/dashboard');
+      navigate('/login');
     } else {
       setError(result.error);
       toast.error('Registration failed');

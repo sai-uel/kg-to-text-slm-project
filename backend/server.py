@@ -1,6 +1,10 @@
 from dotenv import load_dotenv
 from pathlib import Path
-
+import os
+import csv
+import io
+import json
+from fastapi.responses import StreamingResponse
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
@@ -17,7 +21,10 @@ from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional
 from datetime import datetime, timezone, timedelta
 import time
-from huggingface_hub import InferenceClient
+from model_loader import generate_with_model
+
+ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "drugbankkgtotext@uel.com")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "drugbank1919")
 
 # Configure logging
 logging.basicConfig(
@@ -167,14 +174,180 @@ async def get_optional_user(request: Request) -> Optional[dict]:
     except HTTPException:
         return None
 
+async def init_admin_user():
+    email = ADMIN_EMAIL.lower()
+    existing = await db.users.find_one({"email": email})
+
+    if not existing:
+        admin_user = {
+            "name": "Admin",
+            "email": email,
+            "password_hash": hash_password(ADMIN_PASSWORD),
+            "is_admin": True,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.users.insert_one(admin_user)
+        logger.info(f"Admin user created: {email}")
+
 async def get_admin_user(request: Request) -> dict:
     user = await get_current_user(request)
     if not user.get("is_admin", False):
         raise HTTPException(status_code=403, detail="Admin access required")
-    return user
+    return user        
+def build_csv_content(input_triples: str, generated_text: str, latency_ms: int | None = None) -> str:
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["input_triples", "generated_text", "latency_ms"])
+    writer.writerow([input_triples, generated_text, latency_ms if latency_ms is not None else ""])
+    return output.getvalue()
 
+
+def build_jsonl_content(input_triples: str, generated_text: str, latency_ms: int | None = None) -> str:
+    row = {
+        "input_triples": input_triples,
+        "generated_text": generated_text,
+        "latency_ms": latency_ms
+    }
+    return json.dumps(row, ensure_ascii=False) + "\n"
+
+
+def build_ttl_content(input_triples: str, generated_text: str) -> str:
+    safe_text = generated_text.replace('"', '\\"').replace("\n", "\\n")
+    safe_input = input_triples.replace('"', '\\"').replace("\n", "\\n")
+
+    return f"""@prefix ex: <http://example.org/biokg/> .
+@prefix schema: <http://schema.org/> .
+
+ex:generation1 a ex:Generation ;
+    ex:inputTriples "{safe_input}" ;
+    ex:generatedText "{safe_text}" .
+"""
+
+
+def build_rdf_xml_content(input_triples: str, generated_text: str) -> str:
+    safe_text = generated_text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    safe_input = input_triples.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+    return f"""<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:ex="http://example.org/biokg/">
+  <rdf:Description rdf:about="http://example.org/biokg/generation1">
+    <ex:inputTriples>{safe_input}</ex:inputTriples>
+    <ex:generatedText>{safe_text}</ex:generatedText>
+  </rdf:Description>
+</rdf:RDF>
+"""
+
+
+def build_pdf_like_text_content(input_triples: str, generated_text: str, latency_ms: int | None = None) -> str:
+    return f"""BioKG Generation Export
+
+Input Triples:
+{input_triples}
+
+Generated Text:
+{generated_text}
+
+Latency:
+{latency_ms if latency_ms is not None else "N/A"} ms
+"""
+
+from pydantic import BaseModel
+
+class DownloadGenerationRequest(BaseModel):
+    input_triples: str
+    generated_text: str
+    latency_ms: int | None = None
+    format: str
+
+@app.post("/api/generations/download")
+async def download_generation(data: DownloadGenerationRequest, user=Depends(get_current_user)):
+    fmt = data.format.lower().strip()
+
+    if fmt == "csv":
+        content = build_csv_content(data.input_triples, data.generated_text, data.latency_ms)
+        media_type = "text/csv"
+        filename = "generation.csv"
+
+    elif fmt == "jsonl":
+        content = build_jsonl_content(data.input_triples, data.generated_text, data.latency_ms)
+        media_type = "application/jsonl"
+        filename = "generation.jsonl"
+
+    elif fmt == "ttl":
+        content = build_ttl_content(data.input_triples, data.generated_text)
+        media_type = "text/turtle"
+        filename = "generation.ttl"
+
+    elif fmt == "rdf":
+        content = build_rdf_xml_content(data.input_triples, data.generated_text)
+        media_type = "application/rdf+xml"
+        filename = "generation.rdf"
+
+    elif fmt == "pdf":
+        content = build_pdf_like_text_content(data.input_triples, data.generated_text, data.latency_ms)
+        media_type = "text/plain"
+        filename = "generation.pdf"
+
+    else:
+        raise HTTPException(status_code=400, detail="Unsupported download format")
+
+    return StreamingResponse(
+        io.BytesIO(content.encode("utf-8")),
+        media_type=media_type,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+    )    
 # ==================== AUTH ROUTES ====================
+@app.get("/api/generations/{generation_id}/download")
+async def download_saved_generation(generation_id: str, format: str, user=Depends(get_current_user)):
+    generation = await db.generations.find_one({
+        "_id": ObjectId(generation_id),
+        "user_id": user["id"]
+    })
 
+    if not generation:
+        raise HTTPException(status_code=404, detail="Generation not found")
+
+    input_triples = generation.get("input_triples", "")
+    generated_text = generation.get("generated_text", "")
+    latency_ms = generation.get("latency_ms")
+
+    fmt = format.lower().strip()
+
+    if fmt == "csv":
+        content = build_csv_content(input_triples, generated_text, latency_ms)
+        media_type = "text/csv"
+        filename = f"generation_{generation_id}.csv"
+
+    elif fmt == "jsonl":
+        content = build_jsonl_content(input_triples, generated_text, latency_ms)
+        media_type = "application/jsonl"
+        filename = f"generation_{generation_id}.jsonl"
+
+    elif fmt == "ttl":
+        content = build_ttl_content(input_triples, generated_text)
+        media_type = "text/turtle"
+        filename = f"generation_{generation_id}.ttl"
+
+    elif fmt == "rdf":
+        content = build_rdf_xml_content(input_triples, generated_text)
+        media_type = "application/rdf+xml"
+        filename = f"generation_{generation_id}.rdf"
+
+    elif fmt == "pdf":
+        content = build_pdf_like_text_content(input_triples, generated_text, latency_ms)
+        media_type = "text/plain"
+        filename = f"generation_{generation_id}.pdf"
+
+    else:
+        raise HTTPException(status_code=400, detail="Unsupported download format")
+
+    return StreamingResponse(
+        io.BytesIO(content.encode("utf-8")),
+        media_type=media_type,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+    )
 @auth_router.post("/register")
 async def register(data: UserRegister, response: Response):
     email = data.email.lower()
@@ -271,130 +444,82 @@ async def refresh_token(request: Request, response: Response):
 
 @generate_router.post("", response_model=GenerateResponse)
 async def generate_text(data: GenerateRequest, request: Request):
-    """Generate natural language from knowledge graph triples using HuggingFace model"""
+    """Generate natural language from knowledge graph triples using local Gemma + LoRA model"""
     start_time = time.time()
-    
-    # Format the prompt exactly as specified
+
     prompt = f"""<start_of_turn>user
 Convert the following drug knowledge graph triples into a clear and complete natural language description.
 
 {data.triples}<end_of_turn>
 <start_of_turn>model
 """
-    
-    if not HF_TOKEN:
-        raise HTTPException(
-            status_code=503, 
-            detail="HuggingFace API token not configured. Please add HF_TOKEN to environment variables."
-        )
-    
-    # Use a model available via HuggingFace serverless chat completion
-    # Qwen2.5 models work well with chat_completion
-    inference_model = "Qwen/Qwen2.5-72B-Instruct"
-    
+
     try:
-        # Use huggingface_hub InferenceClient for proper API handling
-        hf_client = InferenceClient(token=HF_TOKEN)
-        
-        # Use chat_completion for conversational models
-        messages = [
-            {
-                "role": "user",
-                "content": f"""You are a biomedical expert. Convert the following drug knowledge graph triples into a clear and complete natural language description.
-
-Triples:
-{data.triples}
-
-Provide a coherent paragraph describing the drug information, interactions, and properties from these triples."""
-            }
-        ]
-        
-        result = hf_client.chat_completion(
-            messages=messages,
-            model=inference_model,
-            max_tokens=512,
-            temperature=0.7
+        generated_text = generate_with_model(
+            prompt=prompt,
+            max_new_tokens=300,
+            temperature=0.3
         )
-        
-        generated_text = result.choices[0].message.content.strip() if result.choices else ""
-        
+
         latency_ms = int((time.time() - start_time) * 1000)
-        
+
         return GenerateResponse(
             generated_text=generated_text,
             latency_ms=latency_ms,
             input_length=len(data.triples)
         )
-            
+
     except Exception as e:
         logger.error(f"Generation error: {str(e)}")
-        error_msg = str(e)
-        if "loading" in error_msg.lower():
-            raise HTTPException(status_code=503, detail="Model is loading. Please wait a moment and try again.")
-        elif "timeout" in error_msg.lower():
-            raise HTTPException(status_code=504, detail="Request timed out. Please try again.")
-        raise HTTPException(status_code=500, detail=f"Generation failed: {error_msg}")
+        raise HTTPException(status_code=500, detail=f"Generation failed: {str(e)}")
 
 # ==================== CHAT ROUTES ====================
 
 @chat_router.post("", response_model=ChatResponse)
 async def chat_with_ai(data: ChatRequest):
-    """Chat with the DrugKG AI Assistant about pharmaceutical topics"""
-    
-    if not HF_TOKEN:
-        raise HTTPException(
-            status_code=503, 
-            detail="AI service not configured"
-        )
-    
-    inference_model = "Qwen/Qwen2.5-72B-Instruct"
-    
+    """Chat with the DrugKG AI Assistant using local Gemma + LoRA model"""
+
     try:
-        hf_client = InferenceClient(token=HF_TOKEN)
-        
-        # Build conversation history
-        messages = [
-            {
-                "role": "system",
-                "content": """You are DrugKG AI Assistant, an expert in pharmaceutical knowledge and drug information. You specialize in:
+        history_text = ""
+        for msg in data.history[-4:]:
+            if msg.role == "user":
+                history_text += f"<start_of_turn>user\n{msg.content}<end_of_turn>\n"
+            else:
+                history_text += f"<start_of_turn>model\n{msg.content}<end_of_turn>\n"
+
+        prompt = f"""<start_of_turn>user
+You are DrugKG AI Assistant, an expert in pharmaceutical knowledge and DrugBank-related information.
+
+You specialize in:
 - Drug interactions and mechanisms of action
 - Converting knowledge graph triples to natural language
 - Explaining drug properties, indications, and contraindications
 - DrugBank database information
 
-Be helpful, accurate, and concise. If asked about knowledge graph triples, explain them clearly. 
-If you don't know something, say so rather than making up information.
-Keep responses focused on pharmaceutical and biomedical topics."""
-            }
-        ]
-        
-        # Add conversation history
-        for msg in data.history[-4:]:  # Last 4 messages for context
-            messages.append({
-                "role": msg.role,
-                "content": msg.content
-            })
-        
-        # Add current user message
-        messages.append({
-            "role": "user",
-            "content": data.message
-        })
-        
-        result = hf_client.chat_completion(
-            messages=messages,
-            model=inference_model,
-            max_tokens=400,
-            temperature=0.7
+Be accurate, concise, and domain-focused.
+If a question is outside pharmaceutical or biomedical topics, say that your scope is limited.
+If you do not know something, say so instead of making up information.<end_of_turn>
+{history_text}<start_of_turn>user
+{data.message}<end_of_turn>
+<start_of_turn>model
+"""
+
+        response_text = generate_with_model(
+            prompt=prompt,
+            max_new_tokens=220,
+            temperature=0.5
         )
-        
-        response_text = result.choices[0].message.content.strip() if result.choices else "I apologize, I couldn't generate a response. Please try again."
-        
+
+        if not response_text:
+            response_text = "I apologize, I couldn't generate a response. Please try again."
+
         return ChatResponse(response=response_text)
-            
+
     except Exception as e:
         logger.error(f"Chat error: {str(e)}")
-        return ChatResponse(response="I encountered an issue processing your request. Please try again or use the Generate feature for knowledge graph transformations.")
+        return ChatResponse(
+            response="I encountered an issue processing your request. Please try again or use the Generate feature for knowledge graph transformations."
+        )
 
 # ==================== GENERATIONS (SAVED) ROUTES ====================
 
@@ -603,10 +728,13 @@ app.include_router(api_router)
 
 # ==================== MIDDLEWARE ====================
 
+frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+cors_origins = [o.strip() for o in os.environ.get("CORS_ORIGINS", frontend_url).split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=[os.environ.get('FRONTEND_URL', 'http://localhost:3000')] + os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=cors_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -615,6 +743,22 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
+    await init_admin_user()
+
+    memory_dir = Path(__file__).resolve().parent / "memory"
+    memory_dir.mkdir(parents=True, exist_ok=True)
+
+    credentials_file = memory_dir / "test_credentials.md"
+    with open(credentials_file, "w") as f:
+        f.write(f"""# Test Credentials
+
+## Admin User
+Email: {ADMIN_EMAIL}
+Password: {ADMIN_PASSWORD}
+
+## API Base URL
+http://localhost:8000
+""")
     # Create indexes
     await db.users.create_index("email", unique=True)
     await db.generations.create_index("user_id")
@@ -643,8 +787,11 @@ async def startup_event():
         logger.info(f"Admin password updated for: {admin_email}")
     
     # Write test credentials
-    Path("/app/memory").mkdir(parents=True, exist_ok=True)
-    with open("/app/memory/test_credentials.md", "w") as f:
+   
+    BASE_DIR = Path(__file__).resolve().parent
+    MEMORY_DIR = BASE_DIR / "memory"
+    MEMORY_DIR.mkdir(parents=True, exist_ok=True)
+    with open(MEMORY_DIR / "test_credentials.md", "w") as f:
         f.write("# Test Credentials\n\n")
         f.write("## Admin Account\n")
         f.write(f"- Email: {admin_email}\n")

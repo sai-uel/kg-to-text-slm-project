@@ -41,7 +41,7 @@
   "seed_data_creation": "None - used existing admin account",
   "retest_needed": false,
   "should_main_agent_self_test": true,
-  "context_for_next_testing_agent": "All features working correctly. Chatbot uses Qwen2.5-72B-Instruct model via HuggingFace API - responses take 5-10 seconds. 401 interceptor in api.js handles expired tokens by redirecting to login. Chatbot z-index is 99999 to appear above Emergent watermark.",
+  "context_for_next_testing_agent": "All features working correctly. Chatbot uses Qwen2.5-72B-Instruct model via HuggingFace API - responses take 5-10 seconds. 401 interceptor in api.js handles expired tokens by redirecting to login.",
   "features_verified": {
     "chatbot": {
       "toggle_button": "data-testid='chatbot-toggle' - visible on all pages",

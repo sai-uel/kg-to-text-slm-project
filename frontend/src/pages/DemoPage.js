@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { generateText, saveGeneration } from '../services/api';
+import { generateText, saveGeneration, downloadGenerationFile } from '../services/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { 
-  Copy, 
-  Download, 
-  Trash2, 
-  Clock, 
+import {
+  Copy,
+  Download,
+  Trash2,
+  Clock,
   Loader2,
   Save,
   AlertCircle,
@@ -17,9 +17,9 @@ import {
   Upload,
   FileText,
   X,
-  History,
   ChevronRight
-} from 'lucide-react';
+}
+from 'lucide-react';
 import { toast } from 'sonner';
 
 const DemoPage = () => {
@@ -29,30 +29,56 @@ const DemoPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [latency, setLatency] = useState(null);
-  const [history, setHistory] = useState([]);
   const [saved, setSaved] = useState(false);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef(null);
 
-  useEffect(() => {
-    const savedHistory = localStorage.getItem('biokg_generation_history');
-    if (savedHistory) {
-      setHistory(JSON.parse(savedHistory));
-    }
-  }, []);
+  const saveBlobResponse = (response, fallbackName) => {
+    const blob = new Blob([response.data]);
+    const url = window.URL.createObjectURL(blob);
 
-  const saveToHistory = (input, output, latency) => {
-    const newEntry = {
-      id: Date.now(),
-      input,
-      output,
-      latency,
-      timestamp: new Date().toISOString()
-    };
-    const updatedHistory = [newEntry, ...history].slice(0, 10);
-    setHistory(updatedHistory);
-    localStorage.setItem('biokg_generation_history', JSON.stringify(updatedHistory));
+    const a = document.createElement('a');
+    a.href = url;
+
+    const disposition = response.headers['content-disposition'];
+    let filename = fallbackName;
+
+    if (disposition) {
+      const match = disposition.match(/filename="(.+)"/);
+      if (match) {
+        filename = match[1];
+      }
+    }
+
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    window.URL.revokeObjectURL(url);
+  };
+
+  const handleDownloadCurrentGeneration = async (format) => {
+    try {
+      if (!input || !output) {
+        toast.error('Nothing to download');
+        return;
+      }
+
+      const response = await downloadGenerationFile({
+        input_triples: input,
+        generated_text: output,
+        latency_ms: latency,
+        format
+      });
+
+      saveBlobResponse(response, `generation.${format}`);
+      toast.success(`Downloaded as ${format.toUpperCase()}`);
+    } catch (error) {
+      console.error('Download failed:', error);
+      toast.error('Download failed');
+    }
   };
 
   const handleGenerate = async () => {
@@ -60,7 +86,7 @@ const DemoPage = () => {
       toast.error('Please provide knowledge graph triples');
       return;
     }
-    
+
     setLoading(true);
     setError('');
     setOutput('');
@@ -71,7 +97,6 @@ const DemoPage = () => {
       const result = await generateText(input);
       setOutput(result.generated_text);
       setLatency(result.latency_ms);
-      saveToHistory(input, result.generated_text, result.latency_ms);
       toast.success('Generation complete');
     } catch (err) {
       const errorMessage = err.response?.data?.detail || err.message || 'Generation failed';
@@ -82,39 +107,40 @@ const DemoPage = () => {
     }
   };
 
-  const handleSaveGeneration = async () => {
-    if (!isAuthenticated) {
-      toast.error('Sign in to save generations');
-      return;
-    }
-    
+const handleSaveGeneration = async () => {
+  if (!isAuthenticated) {
+    toast.error('Sign in to save generations');
+    return;
+  }
+
+  try {
+    await saveGeneration({
+      input_triples: input,
+      generated_text: output,
+      latency_ms: latency
+    });
+
+    window.dispatchEvent(new Event('generation-saved'));
+    toast.success('Saved to library');
+
+    setSaved(false);
+    setInput('');
+    setOutput('');
+    setError('');
+    setLatency(null);
+    setUploadedFile(null);
+  } catch (err) {
+    toast.error('Failed to save');
+  }
+};
+
+  const handleCopy = async () => {
     try {
-      await saveGeneration({
-        input_triples: input,
-        generated_text: output,
-        latency_ms: latency
-      });
-      setSaved(true);
-      toast.success('Saved to library');
-    } catch (err) {
-      toast.error('Failed to save');
+      await navigator.clipboard.writeText(output);
+      toast.success('Copied');
+    } catch {
+      toast.error('Copy failed');
     }
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(output);
-    toast.success('Copied');
-  };
-
-  const handleDownload = () => {
-    const content = `KNOWLEDGE GRAPH TRIPLES:\n${input}\n\nGENERATED OUTPUT:\n${output}\n\nLatency: ${latency}ms`;
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `biokg-output-${Date.now()}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
   };
 
   const handleClear = () => {
@@ -126,22 +152,15 @@ const DemoPage = () => {
     setUploadedFile(null);
   };
 
-  const handleLoadFromHistory = (entry) => {
-    setInput(entry.input);
-    setOutput(entry.output);
-    setLatency(entry.latency);
-    setSaved(false);
-  };
-
   const parseFileContent = async (file) => {
     const text = await file.text();
     const extension = file.name.split('.').pop().toLowerCase();
-    
+
     try {
       if (extension === 'json') {
         const data = JSON.parse(text);
         if (Array.isArray(data)) {
-          return data.map(item => {
+          return data.map((item) => {
             if (typeof item === 'string') return item;
             if (item.subject && item.predicate && item.object) {
               return `${item.subject} | ${item.predicate} | ${item.object}`;
@@ -152,13 +171,13 @@ const DemoPage = () => {
         return JSON.stringify(data, null, 2);
       } else if (extension === 'csv') {
         const lines = text.trim().split('\n');
-        return lines.map(line => line.replace(/,/g, ' | ')).join('\n');
+        return lines.map((line) => line.replace(/,/g, ' | ')).join('\n');
       } else if (extension === 'ttl' || extension === 'nt' || extension === 'rdf') {
-        const lines = text.trim().split('\n').filter(l => !l.startsWith('@') && !l.startsWith('#') && l.trim());
+        const lines = text.trim().split('\n').filter((l) => !l.startsWith('@') && !l.startsWith('#') && l.trim());
         return lines.join('\n');
       }
       return text;
-    } catch (e) {
+    } catch {
       return text;
     }
   };
@@ -166,18 +185,18 @@ const DemoPage = () => {
   const handleFileUpload = async (file) => {
     const allowedExtensions = ['csv', 'json', 'ttl', 'nt', 'rdf', 'txt'];
     const extension = file.name.split('.').pop().toLowerCase();
-    
+
     if (!allowedExtensions.includes(extension)) {
-      toast.error(`Unsupported format`);
+      toast.error('Unsupported format');
       return;
     }
-    
+
     try {
       const content = await parseFileContent(file);
       setInput(content);
       setUploadedFile(file);
       toast.success(`Loaded ${file.name}`);
-    } catch (e) {
+    } catch {
       toast.error('Failed to parse file');
     }
   };
@@ -192,26 +211,22 @@ const DemoPage = () => {
   return (
     <div className="min-h-screen bg-black" data-testid="demo-page">
       <Navbar />
-      
+
       <main className="pt-24 pb-16">
         <div className="container-app">
-          {/* Header */}
           <div className="mb-12 fade-up">
             <p className="section-overline">KNOWLEDGE GRAPH TRANSFORMATION</p>
             <h1 className="text-4xl md:text-5xl font-black text-white mb-4">
               Generate Clinical Text
             </h1>
             <p className="text-neutral-400 max-w-2xl">
-              Transform pharmaceutical knowledge graph triples into publication-ready 
+              Transform pharmaceutical knowledge graph triples into publication-ready
               natural language for research and clinical documentation.
             </p>
           </div>
 
-          {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Input/Output Section */}
-            <div className="lg:col-span-2 space-y-6 fade-up delay-100">
-              {/* Input Panel */}
+          <div className="grid grid-cols-1 gap-8">
+            <div className="space-y-6 fade-up delay-100">
               <div className="card-dark p-6" data-testid="input-panel">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-lg font-bold text-white">Input Knowledge Graph</h2>
@@ -226,7 +241,7 @@ const DemoPage = () => {
                     Clear
                   </Button>
                 </div>
-                
+
                 <Tabs defaultValue="text" className="w-full">
                   <TabsList className="grid w-full grid-cols-2 mb-4 bg-neutral-800 rounded-none">
                     <TabsTrigger value="text" className="text-sm font-semibold rounded-none data-[state=active]:bg-violet-600">
@@ -238,21 +253,25 @@ const DemoPage = () => {
                       File Upload
                     </TabsTrigger>
                   </TabsList>
-                  
+
                   <TabsContent value="text">
                     <textarea
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
+                      placeholder="Enter KG triples here..."
                       className="textarea-dark min-h-[200px]"
                       data-testid="triples-input"
-                    />
+                  />
                   </TabsContent>
-                  
+
                   <TabsContent value="upload">
                     <div
                       className={`upload-zone-dark ${dragOver ? 'dragover' : ''}`}
                       onDrop={handleDrop}
-                      onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        setDragOver(true);
+                      }}
                       onDragLeave={() => setDragOver(false)}
                       onClick={() => fileInputRef.current?.click()}
                       data-testid="upload-kg-dropzone"
@@ -272,14 +291,14 @@ const DemoPage = () => {
                         or click to browse
                       </p>
                       <div className="flex items-center justify-center gap-2 flex-wrap">
-                        {['CSV', 'JSON', 'TTL', 'RDF', 'TXT'].map(fmt => (
+                        {['CSV', 'JSON', 'TTL', 'RDF', 'TXT'].map((fmt) => (
                           <span key={fmt} className="px-3 py-1 bg-neutral-800 border border-neutral-700 text-xs font-mono text-neutral-400">
                             {fmt}
                           </span>
                         ))}
                       </div>
                     </div>
-                    
+
                     {uploadedFile && (
                       <div className="mt-4 p-3 bg-violet-900/30 border border-violet-500/30 flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -287,14 +306,17 @@ const DemoPage = () => {
                           <span className="text-sm font-medium text-white">{uploadedFile.name}</span>
                         </div>
                         <button
-                          onClick={() => { setUploadedFile(null); setInput(''); }}
+                          onClick={() => {
+                            setUploadedFile(null);
+                            setInput('');
+                          }}
                           className="p-1 hover:bg-neutral-800"
                         >
                           <X className="w-4 h-4 text-neutral-400" />
                         </button>
                       </div>
                     )}
-                    
+
                     {input && (
                       <div className="mt-4">
                         <p className="text-xs font-bold tracking-wider text-neutral-500 mb-2">PARSED CONTENT</p>
@@ -307,7 +329,7 @@ const DemoPage = () => {
                     )}
                   </TabsContent>
                 </Tabs>
-                
+
                 <div className="flex items-center justify-between mt-6 pt-6 border-t border-neutral-800">
                   <span className="text-sm text-neutral-500">
                     {input.length} characters
@@ -333,7 +355,6 @@ const DemoPage = () => {
                 </div>
               </div>
 
-              {/* Output Panel */}
               <div className="card-dark" data-testid="output-panel">
                 <div className="flex items-center justify-between p-6 border-b border-neutral-800">
                   <div className="flex items-center gap-3">
@@ -345,8 +366,9 @@ const DemoPage = () => {
                       </span>
                     )}
                   </div>
+
                   {output && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap justify-end">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -356,15 +378,7 @@ const DemoPage = () => {
                       >
                         <Copy className="w-4 h-4" />
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleDownload}
-                        className="text-neutral-400 hover:text-white"
-                        data-testid="download-output-btn"
-                      >
-                        <Download className="w-4 h-4" />
-                      </Button>
+
                       {isAuthenticated && !saved && (
                         <Button
                           variant="ghost"
@@ -377,6 +391,7 @@ const DemoPage = () => {
                           Save
                         </Button>
                       )}
+
                       {saved && (
                         <span className="flex items-center gap-1 text-sm text-emerald-400">
                           <CheckCircle2 className="w-4 h-4" />
@@ -405,11 +420,28 @@ const DemoPage = () => {
                       </div>
                     </div>
                   ) : output ? (
-                    <div className="output-container min-h-[200px]">
-                      <p className="output-text whitespace-pre-wrap" data-testid="generated-text">
-                        {output}
-                      </p>
-                    </div>
+                    <>
+                      <div className="output-container min-h-[200px]">
+                        <p className="output-text whitespace-pre-wrap" data-testid="generated-text">
+                          {output}
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 mt-4">
+                        {['csv', 'rdf', 'ttl', 'pdf', 'jsonl'].map((fmt) => (
+                          <Button
+                            key={fmt}
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleDownloadCurrentGeneration(fmt)}
+                            className="border-neutral-700 text-neutral-300 hover:bg-neutral-800"
+                          >
+                            <Download className="w-4 h-4 mr-2" />
+                            Download {fmt.toUpperCase()}
+                          </Button>
+                        ))}
+                      </div>
+                    </>
                   ) : (
                     <div className="min-h-[200px] flex items-center justify-center border border-dashed border-neutral-700">
                       <div className="text-center">
@@ -422,64 +454,6 @@ const DemoPage = () => {
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
-
-            {/* History Panel */}
-            <div className="fade-up delay-200">
-              <div className="card-dark sticky top-24" data-testid="history-panel">
-                <div className="p-6 border-b border-neutral-800">
-                  <div className="flex items-center gap-2">
-                    <History className="w-5 h-5 text-neutral-500" />
-                    <h2 className="text-lg font-bold text-white">Recent Activity</h2>
-                  </div>
-                </div>
-                
-                <div className="p-4">
-                  {history.length === 0 ? (
-                    <div className="text-center py-8">
-                      <div className="w-12 h-12 mx-auto mb-3 border border-neutral-700 flex items-center justify-center">
-                        <Clock className="w-6 h-6 text-neutral-600" />
-                      </div>
-                      <p className="text-sm font-medium text-neutral-400">No recent activity</p>
-                      <p className="text-xs text-neutral-600 mt-1">Your generations will appear here</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2 max-h-[400px] overflow-y-auto">
-                      {history.map((entry) => (
-                        <button
-                          key={entry.id}
-                          onClick={() => handleLoadFromHistory(entry)}
-                          className="w-full text-left p-3 border border-neutral-800 hover:border-violet-500/50 hover:bg-neutral-800/50 transition-all"
-                          data-testid={`history-item-${entry.id}`}
-                        >
-                          <p className="text-xs text-neutral-500 font-mono mb-1">
-                            {new Date(entry.timestamp).toLocaleString()}
-                          </p>
-                          <p className="text-sm text-neutral-300 font-mono truncate">
-                            {entry.input.split('\n')[0]}
-                          </p>
-                          <span className="text-xs px-2 py-0.5 bg-neutral-800 text-neutral-400 mt-2 inline-block font-mono">
-                            {entry.latency}ms
-                          </span>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {!isAuthenticated && (
-                  <div className="p-4 border-t border-neutral-800">
-                    <div className="p-4 bg-violet-900/20 border border-violet-500/30">
-                      <p className="text-sm font-semibold text-violet-300 mb-1">
-                        Save your work
-                      </p>
-                      <p className="text-xs text-neutral-400">
-                        Create a free account to build your research library.
-                      </p>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>
