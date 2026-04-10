@@ -1,15 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Linkedin, Twitter, Github, Dna } from 'lucide-react';
+import { Dna } from 'lucide-react';
 
 const Footer = () => {
   return (
     <footer className="bg-black border-t border-neutral-800" data-testid="footer">
-      <div className="container-app py-16">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
+      <div className="container-app py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2 mb-6">
+            <div className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-lg bg-violet-600 flex items-center justify-center">
                 <Dna className="w-6 h-6 text-white" />
               </div>
@@ -19,80 +19,60 @@ const Footer = () => {
                 <span className="text-white"> AI</span>
               </span>
             </div>
-            <p className="text-neutral-400 max-w-sm mb-8 leading-relaxed">
-              Transforming pharmaceutical knowledge graphs into actionable clinical insights 
-              through advanced AI-powered natural language processing.
+            <p className="text-neutral-400 max-w-sm leading-relaxed">
+              Advanced AI platform for transforming pharmaceutical knowledge graphs 
+              into actionable clinical insights.
             </p>
-            <div className="flex items-center gap-4">
-              {[Linkedin, Twitter, Github].map((Icon, i) => (
-                <a 
-                  key={i}
-                  href="#" 
-                  className="w-10 h-10 border border-neutral-700 flex items-center justify-center text-neutral-400 hover:text-white hover:border-violet-500 transition-colors"
-                >
-                  <Icon className="w-5 h-5" />
+          </div>
+
+          {/* Platform Links */}
+          <div>
+            <h4 className="font-bold text-white mb-4">Platform</h4>
+            <ul className="space-y-3">
+              <li>
+                <Link to="/demo" className="text-neutral-400 hover:text-white transition-colors text-sm">
+                  Generate Text
+                </Link>
+              </li>
+              <li>
+                <a href="https://go.drugbank.com/" target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors text-sm">
+                  DrugBank
                 </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Links */}
-          <div>
-            <h4 className="font-bold text-white mb-6">Platform</h4>
-            <ul className="space-y-4">
-              {[
-                { label: 'Generate Text', link: '/demo' },
-                { label: 'Research', link: '#' },
-                { label: 'Case Studies', link: '#' },
-                { label: 'API Access', link: '#' }
-              ].map(item => (
-                <li key={item.label}>
-                  <Link to={item.link} className="text-neutral-400 hover:text-white transition-colors text-sm">
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
+              </li>
+              <li>
+                <Link to="/login" className="text-neutral-400 hover:text-white transition-colors text-sm">
+                  Sign In
+                </Link>
+              </li>
             </ul>
           </div>
 
+          {/* About */}
           <div>
-            <h4 className="font-bold text-white mb-6">DrugBank</h4>
-            <ul className="space-y-4">
-              {[
-                { label: 'DrugBank Database', link: 'https://go.drugbank.com/' },
-                { label: 'Drug Ontologies', link: '#' },
-                { label: 'Knowledge Graphs', link: '#' },
-                { label: 'Documentation', link: '#' }
-              ].map(item => (
-                <li key={item.label}>
-                  <a href={item.link} target={item.link.startsWith('http') ? '_blank' : '_self'} rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors text-sm">
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-bold text-white mb-6">About</h4>
-            <ul className="space-y-4">
-              {['Our Mission', 'Technology', 'Privacy Policy', 'Contact'].map(item => (
-                <li key={item}>
-                  <a href="#" className="text-neutral-400 hover:text-white transition-colors text-sm">
-                    {item}
-                  </a>
-                </li>
-              ))}
+            <h4 className="font-bold text-white mb-4">About</h4>
+            <ul className="space-y-3">
+              <li>
+                <a href="#" className="text-neutral-400 hover:text-white transition-colors text-sm">
+                  Our Mission
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-neutral-400 hover:text-white transition-colors text-sm">
+                  Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a href="#" className="text-neutral-400 hover:text-white transition-colors text-sm">
+                  Contact
+                </a>
+              </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-neutral-800 mt-16 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-neutral-500 text-sm">
+        <div className="border-t border-neutral-800 mt-8 pt-8">
+          <p className="text-neutral-500 text-sm text-center">
             © {new Date().getFullYear()} DrugKG Text AI. All rights reserved.
-          </p>
-          <p className="text-neutral-500 text-sm">
-            Enterprise AI for Pharmaceutical Research
           </p>
         </div>
       </div>

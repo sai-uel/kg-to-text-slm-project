@@ -48,6 +48,7 @@ auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
 generate_router = APIRouter(prefix="/generate", tags=["Generation"])
 generations_router = APIRouter(prefix="/generations", tags=["Generations"])
 admin_router = APIRouter(prefix="/admin", tags=["Admin"])
+chat_router = APIRouter(prefix="/chat", tags=["Chat"])
 
 # ==================== SCHEMAS ====================
 
@@ -95,6 +96,17 @@ class AdminStats(BaseModel):
     avg_latency_ms: float
     generations_today: int
     generations_this_week: int
+
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+class ChatRequest(BaseModel):
+    message: str
+    history: Optional[List[ChatMessage]] = []
+
+class ChatResponse(BaseModel):
+    response: str
 
 # ==================== PASSWORD UTILITIES ====================
 
@@ -323,6 +335,67 @@ Provide a coherent paragraph describing the drug information, interactions, and 
             raise HTTPException(status_code=504, detail="Request timed out. Please try again.")
         raise HTTPException(status_code=500, detail=f"Generation failed: {error_msg}")
 
+# ==================== CHAT ROUTES ====================
+
+@chat_router.post("", response_model=ChatResponse)
+async def chat_with_ai(data: ChatRequest):
+    """Chat with the DrugKG AI Assistant about pharmaceutical topics"""
+    
+    if not HF_TOKEN:
+        raise HTTPException(
+            status_code=503, 
+            detail="AI service not configured"
+        )
+    
+    inference_model = "Qwen/Qwen2.5-72B-Instruct"
+    
+    try:
+        hf_client = InferenceClient(token=HF_TOKEN)
+        
+        # Build conversation history
+        messages = [
+            {
+                "role": "system",
+                "content": """You are DrugKG AI Assistant, an expert in pharmaceutical knowledge and drug information. You specialize in:
+- Drug interactions and mechanisms of action
+- Converting knowledge graph triples to natural language
+- Explaining drug properties, indications, and contraindications
+- DrugBank database information
+
+Be helpful, accurate, and concise. If asked about knowledge graph triples, explain them clearly. 
+If you don't know something, say so rather than making up information.
+Keep responses focused on pharmaceutical and biomedical topics."""
+            }
+        ]
+        
+        # Add conversation history
+        for msg in data.history[-4:]:  # Last 4 messages for context
+            messages.append({
+                "role": msg.role,
+                "content": msg.content
+            })
+        
+        # Add current user message
+        messages.append({
+            "role": "user",
+            "content": data.message
+        })
+        
+        result = hf_client.chat_completion(
+            messages=messages,
+            model=inference_model,
+            max_tokens=400,
+            temperature=0.7
+        )
+        
+        response_text = result.choices[0].message.content.strip() if result.choices else "I apologize, I couldn't generate a response. Please try again."
+        
+        return ChatResponse(response=response_text)
+            
+    except Exception as e:
+        logger.error(f"Chat error: {str(e)}")
+        return ChatResponse(response="I encountered an issue processing your request. Please try again or use the Generate feature for knowledge graph transformations.")
+
 # ==================== GENERATIONS (SAVED) ROUTES ====================
 
 @generations_router.post("/save")
@@ -525,6 +598,7 @@ api_router.include_router(auth_router)
 api_router.include_router(generate_router)
 api_router.include_router(generations_router)
 api_router.include_router(admin_router)
+api_router.include_router(chat_router)
 app.include_router(api_router)
 
 # ==================== MIDDLEWARE ====================

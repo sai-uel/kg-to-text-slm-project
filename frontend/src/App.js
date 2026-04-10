@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "sonner";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute, AdminRoute } from "./components/ProtectedRoute";
+import Chatbot from "./components/Chatbot";
 
 // Pages
 import LandingPage from "./pages/LandingPage";
@@ -23,7 +24,7 @@ function App() {
           closeButton
           toastOptions={{
             style: {
-              fontFamily: "'Manrope', sans-serif",
+              fontFamily: "'Inter', sans-serif",
             },
           }}
         />
@@ -54,6 +55,7 @@ function App() {
             } 
           />
         </Routes>
+        <Chatbot />
       </BrowserRouter>
     </AuthProvider>
   );

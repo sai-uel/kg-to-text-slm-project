@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
   Menu, 
@@ -7,7 +7,6 @@ import {
   LogOut, 
   LayoutDashboard, 
   Shield,
-  ChevronDown,
   Dna
 } from 'lucide-react';
 import {
@@ -22,7 +21,6 @@ import { Button } from '../components/ui/button';
 const Navbar = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const handleLogout = async () => {
@@ -51,79 +49,33 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
-            <DropdownMenu>
-              <DropdownMenuTrigger className="nav-link">
-                Research <ChevronDown className="w-4 h-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-neutral-900 border-neutral-800 w-56">
-                <DropdownMenuItem className="text-white hover:bg-neutral-800 cursor-pointer">
-                  Drug Interaction Studies
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-white hover:bg-neutral-800 cursor-pointer">
-                  Clinical Documentation AI
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-white hover:bg-neutral-800 cursor-pointer">
-                  Pharmacovigilance Reports
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-white hover:bg-neutral-800 cursor-pointer">
-                  Publications
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+          <div className="hidden md:flex items-center gap-2">
+            <Link to="/demo">
+              <Button className="btn-primary" data-testid="nav-generate">
+                Generate
+              </Button>
+            </Link>
             
-            <DropdownMenu>
-              <DropdownMenuTrigger className="nav-link">
-                DrugBank <ChevronDown className="w-4 h-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-neutral-900 border-neutral-800 w-56">
-                <DropdownMenuItem className="text-white hover:bg-neutral-800 cursor-pointer">
-                  <a href="https://go.drugbank.com/" target="_blank" rel="noopener noreferrer" className="w-full">
-                    DrugBank Database
-                  </a>
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-white hover:bg-neutral-800 cursor-pointer">
-                  Drug Ontologies
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-white hover:bg-neutral-800 cursor-pointer">
-                  Knowledge Graph Schema
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-white hover:bg-neutral-800 cursor-pointer">
-                  API Documentation
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <a 
+              href="https://go.drugbank.com/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white transition-colors"
+            >
+              DrugBank
+            </a>
             
-            <DropdownMenu>
-              <DropdownMenuTrigger className="nav-link">
-                About <ChevronDown className="w-4 h-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-neutral-900 border-neutral-800 w-64">
-                <div className="px-3 py-3 border-b border-neutral-800">
-                  <p className="text-sm text-white font-semibold mb-1">DrugKG Text AI Platform</p>
-                  <p className="text-xs text-neutral-400">
-                    Advanced AI platform for transforming pharmaceutical knowledge graphs into natural language clinical insights.
-                  </p>
-                </div>
-                <DropdownMenuItem className="text-white hover:bg-neutral-800 cursor-pointer">
-                  Our Mission
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-white hover:bg-neutral-800 cursor-pointer">
-                  Technology
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-white hover:bg-neutral-800 cursor-pointer">
-                  Contact Us
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Link to="/#about" className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white transition-colors">
+              About
+            </Link>
 
             {isAuthenticated && (
-              <Link to="/dashboard" className="nav-link" data-testid="nav-dashboard">
+              <Link to="/dashboard" className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white transition-colors" data-testid="nav-dashboard">
                 Dashboard
               </Link>
             )}
             {isAdmin && (
-              <Link to="/admin" className="nav-link" data-testid="nav-admin">
+              <Link to="/admin" className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white transition-colors" data-testid="nav-admin">
                 Admin
               </Link>
             )}
@@ -182,12 +134,6 @@ const Navbar = () => {
                 </Button>
               </Link>
             )}
-            
-            <Link to="/demo">
-              <Button className="btn-primary" data-testid="nav-generate">
-                Generate
-              </Button>
-            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -204,19 +150,22 @@ const Navbar = () => {
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-neutral-800">
             <div className="flex flex-col gap-2">
-              <Link to="/demo" className="px-4 py-3 text-white hover:bg-neutral-800" onClick={() => setMobileMenuOpen(false)}>
+              <Link to="/demo" className="px-4 py-3 text-white bg-violet-600" onClick={() => setMobileMenuOpen(false)}>
                 Generate
               </Link>
-              <a href="#" className="px-4 py-3 text-white/80 hover:bg-neutral-800">Research</a>
-              <a href="https://go.drugbank.com/" target="_blank" rel="noopener noreferrer" className="px-4 py-3 text-white/80 hover:bg-neutral-800">DrugBank</a>
-              <a href="#" className="px-4 py-3 text-white/80 hover:bg-neutral-800">About</a>
+              <a href="https://go.drugbank.com/" target="_blank" rel="noopener noreferrer" className="px-4 py-3 text-white/80">
+                DrugBank
+              </a>
+              <Link to="/#about" className="px-4 py-3 text-white/80" onClick={() => setMobileMenuOpen(false)}>
+                About
+              </Link>
               {isAuthenticated && (
-                <Link to="/dashboard" className="px-4 py-3 text-white hover:bg-neutral-800" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/dashboard" className="px-4 py-3 text-white" onClick={() => setMobileMenuOpen(false)}>
                   Dashboard
                 </Link>
               )}
               {isAdmin && (
-                <Link to="/admin" className="px-4 py-3 text-white hover:bg-neutral-800" onClick={() => setMobileMenuOpen(false)}>
+                <Link to="/admin" className="px-4 py-3 text-white" onClick={() => setMobileMenuOpen(false)}>
                   Admin
                 </Link>
               )}
