@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional
 from datetime import datetime, timezone, timedelta
 import time
+from huggingface_hub import InferenceClient
 
 # Configure logging
 logging.basicConfig(
@@ -275,67 +276,52 @@ Convert the following drug knowledge graph triples into a clear and complete nat
             detail="HuggingFace API token not configured. Please add HF_TOKEN to environment variables."
         )
     
+    # Use a model available via HuggingFace serverless chat completion
+    # Qwen2.5 models work well with chat_completion
+    inference_model = "Qwen/Qwen2.5-72B-Instruct"
+    
     try:
-        async with httpx.AsyncClient(timeout=120.0) as client_http:
-            response = await client_http.post(
-                f"https://api-inference.huggingface.co/models/{HF_MODEL_ID}",
-                headers={"Authorization": f"Bearer {HF_TOKEN}"},
-                json={
-                    "inputs": prompt,
-                    "parameters": {
-                        "max_new_tokens": 512,
-                        "temperature": 0.7,
-                        "do_sample": True,
-                        "return_full_text": False
-                    }
-                }
-            )
+        # Use huggingface_hub InferenceClient for proper API handling
+        hf_client = InferenceClient(token=HF_TOKEN)
+        
+        # Use chat_completion for conversational models
+        messages = [
+            {
+                "role": "user",
+                "content": f"""You are a biomedical expert. Convert the following drug knowledge graph triples into a clear and complete natural language description.
+
+Triples:
+{data.triples}
+
+Provide a coherent paragraph describing the drug information, interactions, and properties from these triples."""
+            }
+        ]
+        
+        result = hf_client.chat_completion(
+            messages=messages,
+            model=inference_model,
+            max_tokens=512,
+            temperature=0.7
+        )
+        
+        generated_text = result.choices[0].message.content.strip() if result.choices else ""
+        
+        latency_ms = int((time.time() - start_time) * 1000)
+        
+        return GenerateResponse(
+            generated_text=generated_text,
+            latency_ms=latency_ms,
+            input_length=len(data.triples)
+        )
             
-            if response.status_code == 503:
-                error_data = response.json()
-                if "loading" in str(error_data).lower():
-                    raise HTTPException(
-                        status_code=503,
-                        detail="Model is loading. Please wait a moment and try again."
-                    )
-            
-            if response.status_code != 200:
-                logger.error(f"HuggingFace API error: {response.status_code} - {response.text}")
-                raise HTTPException(
-                    status_code=response.status_code,
-                    detail=f"HuggingFace API error: {response.text}"
-                )
-            
-            result = response.json()
-            
-            # Extract generated text
-            if isinstance(result, list) and len(result) > 0:
-                generated_text = result[0].get("generated_text", "")
-            elif isinstance(result, dict):
-                generated_text = result.get("generated_text", "")
-            else:
-                generated_text = str(result)
-            
-            # Clean up the generated text
-            generated_text = generated_text.strip()
-            if "<end_of_turn>" in generated_text:
-                generated_text = generated_text.split("<end_of_turn>")[0].strip()
-            
-            latency_ms = int((time.time() - start_time) * 1000)
-            
-            return GenerateResponse(
-                generated_text=generated_text,
-                latency_ms=latency_ms,
-                input_length=len(data.triples)
-            )
-            
-    except httpx.TimeoutException:
-        raise HTTPException(status_code=504, detail="Request to HuggingFace timed out. Please try again.")
-    except HTTPException:
-        raise
     except Exception as e:
         logger.error(f"Generation error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Generation failed: {str(e)}")
+        error_msg = str(e)
+        if "loading" in error_msg.lower():
+            raise HTTPException(status_code=503, detail="Model is loading. Please wait a moment and try again.")
+        elif "timeout" in error_msg.lower():
+            raise HTTPException(status_code=504, detail="Request timed out. Please try again.")
+        raise HTTPException(status_code=500, detail=f"Generation failed: {error_msg}")
 
 # ==================== GENERATIONS (SAVED) ROUTES ====================
 
