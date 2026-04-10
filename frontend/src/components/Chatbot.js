@@ -65,7 +65,8 @@ const Chatbot = () => {
       {/* Chat Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-violet-600 rounded-full flex items-center justify-center shadow-lg hover:bg-violet-500 transition-all z-50 group"
+        className="fixed bottom-6 right-6 w-14 h-14 bg-violet-600 rounded-full flex items-center justify-center shadow-lg hover:bg-violet-500 transition-all group"
+        style={{ zIndex: 99999 }}
         data-testid="chatbot-toggle"
       >
         {isOpen ? (
@@ -83,7 +84,8 @@ const Chatbot = () => {
       {/* Chat Window */}
       {isOpen && (
         <div 
-          className="fixed bottom-24 right-6 w-[380px] h-[500px] bg-neutral-900 border border-neutral-800 rounded-lg shadow-2xl flex flex-col z-50 overflow-hidden"
+          className="fixed bottom-24 right-6 w-[380px] h-[500px] bg-neutral-900 border border-neutral-800 rounded-lg shadow-2xl flex flex-col overflow-hidden"
+          style={{ zIndex: 99999 }}
           data-testid="chatbot-window"
         >
           {/* Header */}

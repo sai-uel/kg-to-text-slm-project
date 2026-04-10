@@ -20,6 +20,20 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Handle 401 responses by clearing auth and redirecting to login
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('access_token');
+      if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Generation API
 export const generateText = async (triples) => {
   const response = await api.post('/generate', { triples });
