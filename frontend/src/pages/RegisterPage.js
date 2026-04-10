@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Eye, EyeOff, Loader2, ArrowRight, Check } from 'lucide-react';
+import { Eye, EyeOff, Loader2, ArrowRight, Check, Dna } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -50,7 +50,7 @@ const RegisterPage = () => {
         <div className="relative max-w-md z-10">
           <div className="w-12 h-1 bg-white mb-6" />
           <h2 className="text-3xl font-bold text-white mb-4">
-            Join BioKG
+            Join DrugKG Text AI
           </h2>
           <p className="text-violet-100 text-lg mb-8 leading-relaxed">
             Create your account to unlock pharmaceutical knowledge graph 
@@ -79,9 +79,15 @@ const RegisterPage = () => {
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-1 mb-12">
-            <span className="text-violet-500 text-3xl font-black">&gt;</span>
-            <span className="font-bold text-xl text-white tracking-tight">BioKG</span>
+          <Link to="/" className="flex items-center gap-2 mb-12">
+            <div className="w-10 h-10 rounded-lg bg-violet-600 flex items-center justify-center">
+              <Dna className="w-6 h-6 text-white" />
+            </div>
+            <span className="font-bold text-xl tracking-tight">
+              <span className="text-white">Drug</span>
+              <span className="text-violet-400">KG Text</span>
+              <span className="text-white"> AI</span>
+            </span>
           </Link>
 
           <h1 className="text-3xl font-black text-white mb-2">Create account</h1>

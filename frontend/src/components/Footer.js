@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Linkedin, Twitter, Youtube, Instagram } from 'lucide-react';
+import { Linkedin, Twitter, Github, Dna } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -9,10 +9,14 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
           {/* Brand */}
           <div className="md:col-span-2">
-            <div className="flex items-center gap-1 mb-6">
-              <span className="text-violet-500 text-3xl font-black">&gt;</span>
-              <span className="font-bold text-xl text-white tracking-tight">
-                BioKG
+            <div className="flex items-center gap-2 mb-6">
+              <div className="w-10 h-10 rounded-lg bg-violet-600 flex items-center justify-center">
+                <Dna className="w-6 h-6 text-white" />
+              </div>
+              <span className="font-bold text-xl tracking-tight">
+                <span className="text-white">Drug</span>
+                <span className="text-violet-400">KG Text</span>
+                <span className="text-white"> AI</span>
               </span>
             </div>
             <p className="text-neutral-400 max-w-sm mb-8 leading-relaxed">
@@ -20,11 +24,11 @@ const Footer = () => {
               through advanced AI-powered natural language processing.
             </p>
             <div className="flex items-center gap-4">
-              {[Linkedin, Twitter, Youtube, Instagram].map((Icon, i) => (
+              {[Linkedin, Twitter, Github].map((Icon, i) => (
                 <a 
                   key={i}
                   href="#" 
-                  className="w-10 h-10 border border-neutral-700 flex items-center justify-center text-neutral-400 hover:text-white hover:border-white transition-colors"
+                  className="w-10 h-10 border border-neutral-700 flex items-center justify-center text-neutral-400 hover:text-white hover:border-violet-500 transition-colors"
                 >
                   <Icon className="w-5 h-5" />
                 </a>
@@ -36,10 +40,15 @@ const Footer = () => {
           <div>
             <h4 className="font-bold text-white mb-6">Platform</h4>
             <ul className="space-y-4">
-              {['Generate Text', 'Research', 'Case Studies', 'API Access'].map(item => (
-                <li key={item}>
-                  <Link to="/demo" className="text-neutral-400 hover:text-white transition-colors text-sm">
-                    {item}
+              {[
+                { label: 'Generate Text', link: '/demo' },
+                { label: 'Research', link: '#' },
+                { label: 'Case Studies', link: '#' },
+                { label: 'API Access', link: '#' }
+              ].map(item => (
+                <li key={item.label}>
+                  <Link to={item.link} className="text-neutral-400 hover:text-white transition-colors text-sm">
+                    {item.label}
                   </Link>
                 </li>
               ))}
@@ -47,12 +56,17 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-bold text-white mb-6">Company</h4>
+            <h4 className="font-bold text-white mb-6">DrugBank</h4>
             <ul className="space-y-4">
-              {['About Us', 'Careers', 'News', 'Contact'].map(item => (
-                <li key={item}>
-                  <a href="#" className="text-neutral-400 hover:text-white transition-colors text-sm">
-                    {item}
+              {[
+                { label: 'DrugBank Database', link: 'https://go.drugbank.com/' },
+                { label: 'Drug Ontologies', link: '#' },
+                { label: 'Knowledge Graphs', link: '#' },
+                { label: 'Documentation', link: '#' }
+              ].map(item => (
+                <li key={item.label}>
+                  <a href={item.link} target={item.link.startsWith('http') ? '_blank' : '_self'} rel="noopener noreferrer" className="text-neutral-400 hover:text-white transition-colors text-sm">
+                    {item.label}
                   </a>
                 </li>
               ))}
@@ -60,9 +74,9 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-bold text-white mb-6">Resources</h4>
+            <h4 className="font-bold text-white mb-6">About</h4>
             <ul className="space-y-4">
-              {['Documentation', 'Support', 'Privacy Policy', 'Terms of Service'].map(item => (
+              {['Our Mission', 'Technology', 'Privacy Policy', 'Contact'].map(item => (
                 <li key={item}>
                   <a href="#" className="text-neutral-400 hover:text-white transition-colors text-sm">
                     {item}
@@ -75,7 +89,7 @@ const Footer = () => {
 
         <div className="border-t border-neutral-800 mt-16 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-neutral-500 text-sm">
-            © {new Date().getFullYear()} BioKG Text AI. All rights reserved.
+            © {new Date().getFullYear()} DrugKG Text AI. All rights reserved.
           </p>
           <p className="text-neutral-500 text-sm">
             Enterprise AI for Pharmaceutical Research
