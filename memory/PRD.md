@@ -1,14 +1,14 @@
-# DrugBank KG-to-Text AI Platform - PRD
+# BioKG Text AI - PRD
 
 ## Original Problem Statement
-Build a complete production-style full-stack web application for a public HuggingFace model (BSVGK/gemma-1.1-2b-it-drugbank-kg2text-lora_v1) that converts DrugBank-style knowledge graph triples into natural language descriptions.
+Build a complete production-style full-stack web application for a public HuggingFace model that converts DrugBank-style knowledge graph triples into natural language descriptions. Renamed to **BioKG Text AI** with professional medical/pharmaceutical design.
 
 ## Architecture
 - **Frontend**: React 19 + Tailwind CSS + Shadcn UI
 - **Backend**: FastAPI + Python
 - **Database**: MongoDB
 - **Authentication**: JWT with bcrypt password hashing
-- **AI Model**: HuggingFace Inference API (Gemma 2B fine-tuned)
+- **AI Model**: Qwen2.5-72B-Instruct via HuggingFace Inference API
 
 ## User Personas
 1. **Researchers**: Use the platform to convert drug relationship triples into readable text
@@ -17,7 +17,7 @@ Build a complete production-style full-stack web application for a public Huggin
 
 ## Core Requirements (Static)
 - [x] Landing page with hero, features, how-it-works sections
-- [x] Demo page for public KG-to-text generation
+- [x] Generate page with text input AND file upload (CSV, JSON, TTL, RDF)
 - [x] User authentication (register/login/logout)
 - [x] User dashboard with saved generations
 - [x] Admin dashboard with analytics
