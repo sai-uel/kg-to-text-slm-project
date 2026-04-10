@@ -6,7 +6,6 @@ import Footer from '../components/Footer';
 import { Button } from '../components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { 
-  Network, 
   Copy, 
   Download, 
   Trash2, 
@@ -18,7 +17,8 @@ import {
   Upload,
   FileText,
   X,
-  History
+  History,
+  ChevronRight
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -35,7 +35,6 @@ const DemoPage = () => {
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Load history from localStorage
   useEffect(() => {
     const savedHistory = localStorage.getItem('biokg_generation_history');
     if (savedHistory) {
@@ -73,7 +72,7 @@ const DemoPage = () => {
       setOutput(result.generated_text);
       setLatency(result.latency_ms);
       saveToHistory(input, result.generated_text, result.latency_ms);
-      toast.success('Text generation complete');
+      toast.success('Generation complete');
     } catch (err) {
       const errorMessage = err.response?.data?.detail || err.message || 'Generation failed';
       setError(errorMessage);
@@ -85,7 +84,7 @@ const DemoPage = () => {
 
   const handleSaveGeneration = async () => {
     if (!isAuthenticated) {
-      toast.error('Authentication required to save generations');
+      toast.error('Sign in to save generations');
       return;
     }
     
@@ -96,19 +95,19 @@ const DemoPage = () => {
         latency_ms: latency
       });
       setSaved(true);
-      toast.success('Generation saved to your library');
+      toast.success('Saved to library');
     } catch (err) {
-      toast.error('Failed to save generation');
+      toast.error('Failed to save');
     }
   };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(output);
-    toast.success('Copied to clipboard');
+    toast.success('Copied');
   };
 
   const handleDownload = () => {
-    const content = `KNOWLEDGE GRAPH TRIPLES:\n${input}\n\nGENERATED CLINICAL TEXT:\n${output}\n\nProcessing Time: ${latency}ms\nGenerated: ${new Date().toISOString()}`;
+    const content = `KNOWLEDGE GRAPH TRIPLES:\n${input}\n\nGENERATED OUTPUT:\n${output}\n\nLatency: ${latency}ms`;
     const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -116,7 +115,6 @@ const DemoPage = () => {
     a.download = `biokg-output-${Date.now()}.txt`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success('File downloaded');
   };
 
   const handleClear = () => {
@@ -135,7 +133,6 @@ const DemoPage = () => {
     setSaved(false);
   };
 
-  // File handling
   const parseFileContent = async (file) => {
     const text = await file.text();
     const extension = file.name.split('.').pop().toLowerCase();
@@ -143,7 +140,6 @@ const DemoPage = () => {
     try {
       if (extension === 'json') {
         const data = JSON.parse(text);
-        // Handle various JSON structures
         if (Array.isArray(data)) {
           return data.map(item => {
             if (typeof item === 'string') return item;
@@ -158,7 +154,6 @@ const DemoPage = () => {
         const lines = text.trim().split('\n');
         return lines.map(line => line.replace(/,/g, ' | ')).join('\n');
       } else if (extension === 'ttl' || extension === 'nt' || extension === 'rdf') {
-        // Basic TTL parsing - extract subject predicate object patterns
         const lines = text.trim().split('\n').filter(l => !l.startsWith('@') && !l.startsWith('#') && l.trim());
         return lines.join('\n');
       }
@@ -173,7 +168,7 @@ const DemoPage = () => {
     const extension = file.name.split('.').pop().toLowerCase();
     
     if (!allowedExtensions.includes(extension)) {
-      toast.error(`Unsupported format. Use: ${allowedExtensions.join(', ')}`);
+      toast.error(`Unsupported format`);
       return;
     }
     
@@ -194,46 +189,37 @@ const DemoPage = () => {
     if (file) handleFileUpload(file);
   };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setDragOver(true);
-  };
-
-  const handleDragLeave = () => {
-    setDragOver(false);
-  };
-
   return (
-    <div className="min-h-screen bg-slate-50" data-testid="demo-page">
+    <div className="min-h-screen bg-black" data-testid="demo-page">
       <Navbar />
       
       <main className="pt-24 pb-16">
         <div className="container-app">
           {/* Header */}
-          <div className="text-center mb-12 fade-up">
-            <p className="overline mb-4">Knowledge Graph Transformation</p>
-            <h1 className="text-4xl md:text-5xl font-black tracking-tight text-slate-900 mb-4">
+          <div className="mb-12 fade-up">
+            <p className="section-overline">KNOWLEDGE GRAPH TRANSFORMATION</p>
+            <h1 className="text-4xl md:text-5xl font-black text-white mb-4">
               Generate Clinical Text
             </h1>
-            <p className="text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-neutral-400 max-w-2xl">
               Transform pharmaceutical knowledge graph triples into publication-ready 
-              natural language descriptions for research and clinical documentation.
+              natural language for research and clinical documentation.
             </p>
           </div>
 
           {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Input/Output Section */}
             <div className="lg:col-span-2 space-y-6 fade-up delay-100">
               {/* Input Panel */}
-              <div className="card-widget p-6" data-testid="input-panel">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-bold text-slate-900">Input Knowledge Graph</h2>
+              <div className="card-dark p-6" data-testid="input-panel">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-lg font-bold text-white">Input Knowledge Graph</h2>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={handleClear}
-                    className="text-slate-500 hover:text-slate-700"
+                    className="text-neutral-400 hover:text-white"
                     data-testid="clear-btn"
                   >
                     <Trash2 className="w-4 h-4 mr-1" />
@@ -242,12 +228,12 @@ const DemoPage = () => {
                 </div>
                 
                 <Tabs defaultValue="text" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 mb-4">
-                    <TabsTrigger value="text" className="text-sm font-semibold">
+                  <TabsList className="grid w-full grid-cols-2 mb-4 bg-neutral-800 rounded-none">
+                    <TabsTrigger value="text" className="text-sm font-semibold rounded-none data-[state=active]:bg-violet-600">
                       <FileText className="w-4 h-4 mr-2" />
                       Text Input
                     </TabsTrigger>
-                    <TabsTrigger value="upload" className="text-sm font-semibold">
+                    <TabsTrigger value="upload" className="text-sm font-semibold rounded-none data-[state=active]:bg-violet-600">
                       <Upload className="w-4 h-4 mr-2" />
                       File Upload
                     </TabsTrigger>
@@ -257,17 +243,17 @@ const DemoPage = () => {
                     <textarea
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      className="textarea-field min-h-[200px] font-mono text-sm"
+                      className="textarea-dark min-h-[200px]"
                       data-testid="triples-input"
                     />
                   </TabsContent>
                   
                   <TabsContent value="upload">
                     <div
-                      className={`upload-zone ${dragOver ? 'dragover' : ''}`}
+                      className={`upload-zone-dark ${dragOver ? 'dragover' : ''}`}
                       onDrop={handleDrop}
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
+                      onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                      onDragLeave={() => setDragOver(false)}
                       onClick={() => fileInputRef.current?.click()}
                       data-testid="upload-kg-dropzone"
                     >
@@ -278,50 +264,52 @@ const DemoPage = () => {
                         accept=".csv,.json,.ttl,.nt,.rdf,.txt"
                         onChange={(e) => e.target.files[0] && handleFileUpload(e.target.files[0])}
                       />
-                      <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                      <p className="text-lg font-semibold text-slate-700 mb-1">
+                      <Upload className="w-12 h-12 text-neutral-500 mx-auto mb-4" />
+                      <p className="text-lg font-semibold text-white mb-2">
                         Drop your knowledge graph file here
                       </p>
-                      <p className="text-sm text-slate-500 mb-4">
+                      <p className="text-sm text-neutral-500 mb-6">
                         or click to browse
                       </p>
                       <div className="flex items-center justify-center gap-2 flex-wrap">
                         {['CSV', 'JSON', 'TTL', 'RDF', 'TXT'].map(fmt => (
-                          <span key={fmt} className="format-badge">{fmt}</span>
+                          <span key={fmt} className="px-3 py-1 bg-neutral-800 border border-neutral-700 text-xs font-mono text-neutral-400">
+                            {fmt}
+                          </span>
                         ))}
                       </div>
                     </div>
                     
                     {uploadedFile && (
-                      <div className="mt-4 p-3 bg-blue-50 rounded-lg flex items-center justify-between">
+                      <div className="mt-4 p-3 bg-violet-900/30 border border-violet-500/30 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <FileText className="w-5 h-5 text-blue-600" />
-                          <span className="text-sm font-medium text-slate-700">{uploadedFile.name}</span>
+                          <FileText className="w-5 h-5 text-violet-400" />
+                          <span className="text-sm font-medium text-white">{uploadedFile.name}</span>
                         </div>
                         <button
                           onClick={() => { setUploadedFile(null); setInput(''); }}
-                          className="p-1 hover:bg-blue-100 rounded"
+                          className="p-1 hover:bg-neutral-800"
                         >
-                          <X className="w-4 h-4 text-slate-500" />
+                          <X className="w-4 h-4 text-neutral-400" />
                         </button>
                       </div>
                     )}
                     
                     {input && (
                       <div className="mt-4">
-                        <p className="text-sm font-medium text-slate-500 mb-2">Parsed Content:</p>
+                        <p className="text-xs font-bold tracking-wider text-neutral-500 mb-2">PARSED CONTENT</p>
                         <textarea
                           value={input}
                           onChange={(e) => setInput(e.target.value)}
-                          className="textarea-field min-h-[150px] font-mono text-sm"
+                          className="textarea-dark min-h-[150px]"
                         />
                       </div>
                     )}
                   </TabsContent>
                 </Tabs>
                 
-                <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
-                  <span className="text-sm text-slate-500">
+                <div className="flex items-center justify-between mt-6 pt-6 border-t border-neutral-800">
+                  <span className="text-sm text-neutral-500">
                     {input.length} characters
                   </span>
                   <Button
@@ -337,8 +325,8 @@ const DemoPage = () => {
                       </>
                     ) : (
                       <>
-                        <Network className="w-5 h-5 mr-2" />
-                        Generate Text
+                        Generate
+                        <ChevronRight className="w-5 h-5 ml-1 text-violet-300" />
                       </>
                     )}
                   </Button>
@@ -346,12 +334,12 @@ const DemoPage = () => {
               </div>
 
               {/* Output Panel */}
-              <div className="card-widget" data-testid="output-panel">
-                <div className="flex items-center justify-between p-6 border-b border-slate-100">
+              <div className="card-dark" data-testid="output-panel">
+                <div className="flex items-center justify-between p-6 border-b border-neutral-800">
                   <div className="flex items-center gap-3">
-                    <h2 className="text-lg font-bold text-slate-900">Generated Output</h2>
+                    <h2 className="text-lg font-bold text-white">Generated Output</h2>
                     {latency && (
-                      <span className="flex items-center gap-1 text-xs px-2 py-1 bg-emerald-50 text-emerald-600 rounded-full font-medium">
+                      <span className="flex items-center gap-1 text-xs px-2 py-1 bg-emerald-900/30 text-emerald-400 border border-emerald-500/30 font-mono">
                         <Clock className="w-3 h-3" />
                         {latency}ms
                       </span>
@@ -363,7 +351,7 @@ const DemoPage = () => {
                         variant="ghost"
                         size="sm"
                         onClick={handleCopy}
-                        className="text-slate-500 hover:text-slate-700"
+                        className="text-neutral-400 hover:text-white"
                         data-testid="copy-output-btn"
                       >
                         <Copy className="w-4 h-4" />
@@ -372,7 +360,7 @@ const DemoPage = () => {
                         variant="ghost"
                         size="sm"
                         onClick={handleDownload}
-                        className="text-slate-500 hover:text-slate-700"
+                        className="text-neutral-400 hover:text-white"
                         data-testid="download-output-btn"
                       >
                         <Download className="w-4 h-4" />
@@ -382,7 +370,7 @@ const DemoPage = () => {
                           variant="ghost"
                           size="sm"
                           onClick={handleSaveGeneration}
-                          className="text-blue-600 hover:text-blue-700"
+                          className="text-violet-400 hover:text-violet-300"
                           data-testid="save-generation-btn"
                         >
                           <Save className="w-4 h-4 mr-1" />
@@ -390,7 +378,7 @@ const DemoPage = () => {
                         </Button>
                       )}
                       {saved && (
-                        <span className="flex items-center gap-1 text-sm text-emerald-600 font-medium">
+                        <span className="flex items-center gap-1 text-sm text-emerald-400">
                           <CheckCircle2 className="w-4 h-4" />
                           Saved
                         </span>
@@ -402,20 +390,18 @@ const DemoPage = () => {
                 <div className="p-6">
                   {loading ? (
                     <div className="min-h-[200px] flex flex-col items-center justify-center">
-                      <div className="w-16 h-16 rounded-2xl bg-blue-50 flex items-center justify-center mb-4 animate-pulse-blue">
-                        <Network className="w-8 h-8 text-blue-600" />
-                      </div>
-                      <p className="text-slate-700 font-semibold">Synthesizing clinical text...</p>
-                      <p className="text-sm text-slate-500 mt-1">Analyzing knowledge graph relationships</p>
+                      <div className="w-16 h-16 border-2 border-violet-500 border-t-transparent rounded-full animate-spin mb-4" />
+                      <p className="text-white font-semibold">Synthesizing clinical text...</p>
+                      <p className="text-sm text-neutral-500 mt-1">Analyzing knowledge graph relationships</p>
                     </div>
                   ) : error ? (
                     <div className="min-h-[200px] flex items-center justify-center">
                       <div className="text-center">
-                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-50 flex items-center justify-center">
-                          <AlertCircle className="w-8 h-8 text-red-500" />
+                        <div className="w-16 h-16 mx-auto mb-4 border border-red-500/30 bg-red-900/20 flex items-center justify-center">
+                          <AlertCircle className="w-8 h-8 text-red-400" />
                         </div>
-                        <p className="text-red-600 font-semibold mb-2">Processing Error</p>
-                        <p className="text-sm text-slate-500 max-w-md">{error}</p>
+                        <p className="text-red-400 font-semibold mb-2">Processing Error</p>
+                        <p className="text-sm text-neutral-500 max-w-md">{error}</p>
                       </div>
                     </div>
                   ) : output ? (
@@ -425,13 +411,13 @@ const DemoPage = () => {
                       </p>
                     </div>
                   ) : (
-                    <div className="min-h-[200px] flex items-center justify-center border-2 border-dashed border-slate-200 rounded-xl bg-slate-50">
+                    <div className="min-h-[200px] flex items-center justify-center border border-dashed border-neutral-700">
                       <div className="text-center">
-                        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center">
-                          <FileText className="w-8 h-8 text-slate-400" />
+                        <div className="w-16 h-16 mx-auto mb-4 border border-neutral-700 flex items-center justify-center">
+                          <FileText className="w-8 h-8 text-neutral-600" />
                         </div>
-                        <p className="text-slate-600 font-semibold">Clinical text output</p>
-                        <p className="text-sm text-slate-400 mt-1">Provide knowledge graph triples to generate</p>
+                        <p className="text-neutral-400 font-semibold">Output will appear here</p>
+                        <p className="text-sm text-neutral-600 mt-1">Provide knowledge graph triples to generate</p>
                       </div>
                     </div>
                   )}
@@ -441,22 +427,22 @@ const DemoPage = () => {
 
             {/* History Panel */}
             <div className="fade-up delay-200">
-              <div className="card-widget sticky top-24" data-testid="history-panel">
-                <div className="p-6 border-b border-slate-100">
+              <div className="card-dark sticky top-24" data-testid="history-panel">
+                <div className="p-6 border-b border-neutral-800">
                   <div className="flex items-center gap-2">
-                    <History className="w-5 h-5 text-slate-400" />
-                    <h2 className="text-lg font-bold text-slate-900">Recent Activity</h2>
+                    <History className="w-5 h-5 text-neutral-500" />
+                    <h2 className="text-lg font-bold text-white">Recent Activity</h2>
                   </div>
                 </div>
                 
                 <div className="p-4">
                   {history.length === 0 ? (
                     <div className="text-center py-8">
-                      <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-slate-100 flex items-center justify-center">
-                        <Clock className="w-6 h-6 text-slate-400" />
+                      <div className="w-12 h-12 mx-auto mb-3 border border-neutral-700 flex items-center justify-center">
+                        <Clock className="w-6 h-6 text-neutral-600" />
                       </div>
-                      <p className="text-sm font-medium text-slate-600">No recent activity</p>
-                      <p className="text-xs text-slate-400 mt-1">Your generations will appear here</p>
+                      <p className="text-sm font-medium text-neutral-400">No recent activity</p>
+                      <p className="text-xs text-neutral-600 mt-1">Your generations will appear here</p>
                     </div>
                   ) : (
                     <div className="space-y-2 max-h-[400px] overflow-y-auto">
@@ -464,16 +450,16 @@ const DemoPage = () => {
                         <button
                           key={entry.id}
                           onClick={() => handleLoadFromHistory(entry)}
-                          className="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-blue-300 hover:bg-blue-50/50 transition-colors"
+                          className="w-full text-left p-3 border border-neutral-800 hover:border-violet-500/50 hover:bg-neutral-800/50 transition-all"
                           data-testid={`history-item-${entry.id}`}
                         >
-                          <p className="text-xs text-slate-400 font-mono mb-1">
+                          <p className="text-xs text-neutral-500 font-mono mb-1">
                             {new Date(entry.timestamp).toLocaleString()}
                           </p>
-                          <p className="text-sm text-slate-700 font-mono truncate">
+                          <p className="text-sm text-neutral-300 font-mono truncate">
                             {entry.input.split('\n')[0]}
                           </p>
-                          <span className="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded mt-2 inline-block">
+                          <span className="text-xs px-2 py-0.5 bg-neutral-800 text-neutral-400 mt-2 inline-block font-mono">
                             {entry.latency}ms
                           </span>
                         </button>
@@ -483,12 +469,12 @@ const DemoPage = () => {
                 </div>
 
                 {!isAuthenticated && (
-                  <div className="p-4 border-t border-slate-100">
-                    <div className="p-4 bg-blue-50 rounded-xl">
-                      <p className="text-sm font-semibold text-blue-700 mb-1">
-                        Save your generations
+                  <div className="p-4 border-t border-neutral-800">
+                    <div className="p-4 bg-violet-900/20 border border-violet-500/30">
+                      <p className="text-sm font-semibold text-violet-300 mb-1">
+                        Save your work
                       </p>
-                      <p className="text-xs text-blue-600">
+                      <p className="text-xs text-neutral-400">
                         Create a free account to build your research library.
                       </p>
                     </div>

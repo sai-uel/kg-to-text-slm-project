@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,26 +6,26 @@
 
 @layer base {
     :root {
-        --background: 0 0% 100%;
-        --foreground: 222 47% 11%;
-        --card: 0 0% 100%;
-        --card-foreground: 222 47% 11%;
-        --popover: 0 0% 100%;
-        --popover-foreground: 222 47% 11%;
-        --primary: 217 91% 60%;
+        --background: 0 0% 0%;
+        --foreground: 0 0% 100%;
+        --card: 0 0% 7%;
+        --card-foreground: 0 0% 100%;
+        --popover: 0 0% 7%;
+        --popover-foreground: 0 0% 100%;
+        --primary: 271 91% 65%;
         --primary-foreground: 0 0% 100%;
-        --secondary: 222 47% 11%;
+        --secondary: 0 0% 15%;
         --secondary-foreground: 0 0% 100%;
-        --muted: 210 40% 96%;
-        --muted-foreground: 215 16% 47%;
-        --accent: 217 91% 97%;
-        --accent-foreground: 217 91% 60%;
+        --muted: 0 0% 15%;
+        --muted-foreground: 0 0% 65%;
+        --accent: 271 91% 65%;
+        --accent-foreground: 0 0% 100%;
         --destructive: 0 84% 60%;
         --destructive-foreground: 0 0% 98%;
-        --border: 214 32% 91%;
-        --input: 214 32% 91%;
-        --ring: 217 91% 60%;
-        --radius: 0.75rem;
+        --border: 0 0% 20%;
+        --input: 0 0% 20%;
+        --ring: 271 91% 65%;
+        --radius: 0.5rem;
     }
 }
 
@@ -39,123 +39,102 @@
     }
     
     body {
-        @apply bg-white text-slate-900;
-        font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+        @apply bg-black text-white;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
     }
     
     h1, h2, h3, h4, h5, h6 {
-        font-family: 'IBM Plex Sans', sans-serif;
-        font-weight: 700;
+        font-family: 'Inter', sans-serif;
+        font-weight: 800;
     }
     
     code, pre, .font-mono {
-        font-family: 'IBM Plex Mono', monospace;
+        font-family: 'JetBrains Mono', 'Fira Code', monospace;
     }
 }
 
 @layer components {
-    /* Primary Button - Medical Blue */
+    /* Primary Button - Purple */
     .btn-primary {
-        @apply inline-flex items-center justify-center bg-blue-600 text-white font-semibold rounded-lg px-6 py-3 
-               hover:bg-blue-700 transition-all duration-200 shadow-sm 
-               focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none;
+        @apply inline-flex items-center justify-center bg-violet-600 text-white font-semibold rounded-none px-8 py-4 
+               hover:bg-violet-500 transition-all duration-300 
+               focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-black focus:outline-none;
     }
     
-    /* Secondary Button - Dark */
+    /* Secondary Button - Outline */
     .btn-secondary {
-        @apply inline-flex items-center justify-center bg-slate-900 text-white font-semibold rounded-lg px-6 py-3 
-               hover:bg-slate-800 transition-all duration-200 shadow-sm 
-               focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 focus:outline-none;
+        @apply inline-flex items-center justify-center bg-transparent text-white font-semibold border border-white/30 rounded-none px-8 py-4 
+               hover:bg-white/10 hover:border-white/50 transition-all duration-300 
+               focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-black focus:outline-none;
     }
     
-    /* Outline Button */
-    .btn-outline {
-        @apply inline-flex items-center justify-center border-2 border-slate-200 bg-transparent text-slate-900 
-               font-semibold rounded-lg px-6 py-3 
-               hover:border-blue-600 hover:text-blue-600 transition-all duration-200 focus:outline-none;
+    /* Ghost Button */
+    .btn-ghost {
+        @apply inline-flex items-center gap-2 text-white font-semibold 
+               hover:text-violet-400 transition-colors;
     }
     
-    /* Dashboard Widget Card */
-    .card-widget {
-        @apply bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-shadow;
+    /* Card - Dark */
+    .card-dark {
+        @apply bg-neutral-900 border border-neutral-800 rounded-none overflow-hidden;
     }
     
-    /* Bento Marketing Card */
-    .card-bento {
-        @apply bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden relative;
+    /* Card with image overlay */
+    .card-overlay {
+        @apply relative overflow-hidden;
     }
     
-    /* Glass Header */
-    .glass-header {
-        @apply sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-slate-200 shadow-sm;
+    .card-overlay::before {
+        content: '';
+        @apply absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent z-10;
     }
     
-    /* File Upload Zone */
-    .upload-zone {
-        @apply relative border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 p-8 text-center 
-               hover:bg-blue-50 hover:border-blue-400 transition-colors cursor-pointer;
+    /* Navigation */
+    .nav-dark {
+        @apply bg-black/90 backdrop-blur-md border-b border-neutral-800;
     }
     
-    .upload-zone.dragover {
-        @apply bg-blue-50 border-blue-500;
+    .nav-link {
+        @apply text-sm font-medium text-white/80 hover:text-white transition-colors flex items-center gap-1;
     }
     
-    /* Input Styles */
-    .input-field {
-        @apply w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 
-               placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 
+    /* Input fields */
+    .input-dark {
+        @apply w-full bg-neutral-900 border border-neutral-700 text-white rounded-none px-4 py-3 
+               placeholder:text-neutral-500 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 
                transition-all outline-none;
     }
     
-    .textarea-field {
-        @apply w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 
-               placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 
-               transition-all outline-none resize-none;
+    .textarea-dark {
+        @apply w-full bg-neutral-900 border border-neutral-700 text-white rounded-none px-4 py-4 
+               placeholder:text-neutral-500 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 
+               transition-all outline-none resize-none font-mono text-sm;
     }
     
     /* Output Display */
     .output-container {
-        @apply bg-slate-900 rounded-xl p-6 shadow-inner relative overflow-hidden;
+        @apply bg-neutral-950 border border-neutral-800 rounded-none p-6 relative;
     }
     
     .output-text {
         @apply font-mono text-sm text-emerald-400 leading-relaxed;
     }
     
-    /* Fade up animation */
-    .fade-up {
-        animation: fadeUp 0.6s ease-out forwards;
-        opacity: 0;
+    /* Upload Zone */
+    .upload-zone-dark {
+        @apply relative border-2 border-dashed border-neutral-700 bg-neutral-900/50 p-12 text-center 
+               hover:bg-neutral-800/50 hover:border-violet-500/50 transition-all cursor-pointer;
     }
     
-    @keyframes fadeUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .upload-zone-dark.dragover {
+        @apply bg-violet-900/20 border-violet-500;
     }
     
-    /* Staggered animation delays */
-    .delay-100 { animation-delay: 100ms; }
-    .delay-200 { animation-delay: 200ms; }
-    .delay-300 { animation-delay: 300ms; }
-    .delay-400 { animation-delay: 400ms; }
-    .delay-500 { animation-delay: 500ms; }
-    
-    /* Format badges */
-    .format-badge {
-        @apply px-2 py-1 bg-white border border-slate-200 rounded text-xs font-mono text-slate-600 shadow-sm;
-    }
-    
-    /* Overline text */
-    .overline {
-        @apply text-xs font-bold uppercase tracking-[0.2em] text-blue-600;
+    /* Section Title */
+    .section-overline {
+        @apply text-xs font-bold uppercase tracking-[0.3em] text-violet-400 mb-4;
     }
     
     /* Container */
@@ -163,53 +142,74 @@
         @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
     }
     
-    /* Section padding */
-    .section-padding {
-        @apply py-24 md:py-32;
+    /* Large Display Text */
+    .display-text {
+        @apply text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[0.9];
     }
     
-    /* Radial gradient background */
-    .bg-gradient-radial {
-        background: radial-gradient(ellipse at top right, #EFF6FF 0%, #FFFFFF 50%, #FFFFFF 100%);
+    /* Accent chevron */
+    .accent-chevron {
+        @apply text-violet-500 inline-block;
     }
     
-    /* Medical mesh pattern */
-    .bg-medical-mesh {
-        background-image: 
-            radial-gradient(circle at 25% 25%, rgba(37, 99, 235, 0.03) 0%, transparent 50%),
-            radial-gradient(circle at 75% 75%, rgba(37, 99, 235, 0.03) 0%, transparent 50%);
+    /* Fade animations */
+    .fade-up {
+        animation: fadeUp 0.8s ease-out forwards;
+        opacity: 0;
+    }
+    
+    @keyframes fadeUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .delay-100 { animation-delay: 100ms; }
+    .delay-200 { animation-delay: 200ms; }
+    .delay-300 { animation-delay: 300ms; }
+    .delay-400 { animation-delay: 400ms; }
+    .delay-500 { animation-delay: 500ms; }
+    
+    /* Purple line accent */
+    .accent-line {
+        @apply w-8 h-1 bg-violet-500 mb-6;
+    }
+    
+    /* Stat card */
+    .stat-card {
+        @apply bg-neutral-900 border-l-2 border-violet-500 p-6;
     }
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar - dark */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    @apply bg-slate-100;
+    @apply bg-neutral-900;
 }
 
 ::-webkit-scrollbar-thumb {
-    @apply bg-slate-300 rounded-full;
+    @apply bg-neutral-700 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-400;
+    @apply bg-neutral-600;
 }
 
 /* Selection color */
 ::selection {
-    @apply bg-blue-100 text-blue-900;
+    @apply bg-violet-900 text-white;
 }
 
-/* Pulse animation for loading */
-@keyframes pulse-blue {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-
-.animate-pulse-blue {
-    animation: pulse-blue 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+/* Gradient text */
+.text-gradient-purple {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-fuchsia-400;
 }
