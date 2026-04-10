@@ -1,142 +1,154 @@
 {
-  "theme": "Light",
-  "archetype": "Archetype 4 (Swiss & High-Contrast) adapted for Enterprise SaaS",
+  "theme": "light",
+  "archetype": "4 (Swiss & High-Contrast) adapted for Medical AI",
+  "design_philosophy": "Clinical Precision meets Artificial Intelligence. The UI must feel like an advanced, highly sterile, yet incredibly powerful biomedical research tool. Utilizing generous white space, structural bento grids, bold authoritative typography, and a strict medical-blue color palette to evoke trust and high technology. Eradicate all 'demo' or 'toy' aesthetics.",
   "colors": {
     "background": {
-      "default": "#FFFFFF",
-      "muted": "#F8FAFC",
-      "surface": "#FFFFFF",
-      "glass": "rgba(255, 255, 255, 0.7)"
-    },
-    "primary": {
-      "default": "#4338CA",
-      "hover": "#3730A3",
-      "light": "#EEF2FF",
-      "glow": "rgba(67, 56, 202, 0.4)"
-    },
-    "secondary": {
-      "default": "#3B82F6",
-      "hover": "#2563EB",
-      "light": "#DBEAFE"
+      "primary": "#FFFFFF",
+      "secondary": "#F8FAFC",
+      "tertiary": "#F1F5F9",
+      "glass": "rgba(255, 255, 255, 0.8)"
     },
     "text": {
       "primary": "#0F172A",
       "secondary": "#475569",
-      "muted": "#94A3B8",
-      "inverse": "#FFFFFF",
-      "accent": "#4338CA"
+      "tertiary": "#64748B",
+      "inverse": "#FFFFFF"
+    },
+    "primary": {
+      "default": "#2563EB",
+      "hover": "#1D4ED8",
+      "light": "#EFF6FF",
+      "text": "#FFFFFF"
+    },
+    "secondary": {
+      "default": "#0F172A",
+      "hover": "#1E293B",
+      "light": "#F8FAFC",
+      "text": "#FFFFFF"
+    },
+    "accent": {
+      "success": "#10B981",
+      "warning": "#F59E0B",
+      "error": "#EF4444",
+      "node_link": "#6366F1"
     },
     "border": {
       "default": "#E2E8F0",
-      "focus": "#4338CA",
-      "glass": "rgba(255, 255, 255, 0.4)"
-    },
-    "feedback": {
-      "success": "#10B981",
-      "error": "#EF4444",
-      "warning": "#F59E0B"
+      "focus": "#2563EB",
+      "dashed": "#CBD5E1"
     }
   },
   "typography": {
-    "fonts": {
-      "heading": "'Outfit', sans-serif",
-      "body": "'Manrope', sans-serif",
-      "mono": "'JetBrains Mono', monospace"
+    "font_family": {
+      "heading": "Cabinet Grotesk, sans-serif",
+      "body": "IBM Plex Sans, sans-serif",
+      "mono": "IBM Plex Mono, monospace"
     },
-    "scales": {
-      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-none font-bold",
-      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight font-semibold",
-      "h3": "text-xl sm:text-2xl tracking-tight font-medium",
-      "body": "text-base leading-relaxed",
-      "small": "text-sm leading-normal",
-      "overline": "text-xs tracking-[0.2em] uppercase font-bold text-slate-500"
-    }
+    "hierarchy": {
+      "h1": "text-5xl md:text-6xl font-black tracking-tighter text-slate-900 leading-tight",
+      "h2": "text-3xl md:text-4xl font-bold tracking-tight text-slate-900",
+      "h3": "text-xl md:text-2xl font-bold tracking-tight text-slate-900",
+      "h4": "text-lg font-semibold tracking-tight text-slate-900",
+      "body": "text-base text-slate-600 leading-relaxed",
+      "small": "text-sm text-slate-500",
+      "overline": "text-xs font-bold uppercase tracking-[0.2em] text-blue-600"
+    },
+    "specific_instructions": "Title 'BioKG Text AI' must always be displayed in the boldest weight (font-black) with tight letter spacing. Do not use generic Inter for headings."
+  },
+  "spacing_and_layout": {
+    "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "section": "py-24 md:py-32",
+    "grid_modes": {
+      "marketing": "grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12",
+      "dashboard_control_room": "grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6",
+      "bento": "grid grid-cols-1 md:grid-cols-8 lg:grid-cols-12 gap-6"
+    },
+    "border_radius": "rounded-lg md:rounded-xl",
+    "card_padding": "p-6 md:p-8"
   },
   "components": {
-    "button": {
-      "primary": "bg-indigo-600 text-white font-semibold rounded-lg shadow-sm hover:bg-indigo-700 hover:shadow-[0_0_20px_rgba(67,56,202,0.3)] hover:text-indigo-50 transition-all duration-300 px-6 py-3",
-      "secondary": "bg-white text-slate-700 font-medium border border-slate-200 rounded-lg hover:border-indigo-300 hover:bg-slate-50 hover:text-indigo-700 transition-all duration-300 px-6 py-3",
-      "ghost": "text-slate-600 font-medium hover:bg-slate-100 hover:text-slate-900 rounded-lg transition-colors px-4 py-2"
+    "header": {
+      "style": "sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-slate-200 shadow-sm",
+      "nav_links": "text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors"
     },
-    "card": {
-      "default": "bg-white rounded-xl border border-slate-200 shadow-sm",
-      "interactive": "bg-white rounded-xl border border-slate-200 shadow-sm hover:-translate-y-1 hover:shadow-md hover:border-indigo-200 transition-all duration-300",
-      "glass": "bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-xl"
+    "hero": {
+      "layout": "grid md:grid-cols-2 gap-12 items-center min-h-[80vh]",
+      "image_style": "rounded-2xl shadow-2xl object-cover w-full max-h-[70vh]"
     },
-    "input": {
-      "default": "w-full bg-white border border-slate-300 text-slate-900 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all",
-      "textarea_mono": "w-full bg-slate-50 border border-slate-200 font-mono text-sm text-slate-800 rounded-lg p-4 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-inner"
-    }
-  },
-  "layout": {
-    "spacing": {
-      "section_y": "py-24 md:py-32",
-      "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
-      "gap_bento": "gap-4 md:gap-6",
-      "gap_features": "gap-12 md:gap-16"
+    "buttons": {
+      "primary": "inline-flex items-center justify-center bg-blue-600 text-white font-semibold rounded-lg px-6 py-3 hover:bg-blue-700 transition-colors shadow-sm focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
+      "secondary": "inline-flex items-center justify-center bg-slate-900 text-white font-semibold rounded-lg px-6 py-3 hover:bg-slate-800 transition-colors shadow-sm focus:ring-2 focus:ring-slate-900 focus:ring-offset-2",
+      "outline": "inline-flex items-center justify-center border-2 border-slate-200 bg-transparent text-slate-900 font-semibold rounded-lg px-6 py-3 hover:border-blue-600 hover:text-blue-600 transition-colors"
+    },
+    "cards": {
+      "dashboard_widget": "bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-shadow",
+      "bento_marketing": "bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden relative group"
+    },
+    "file_upload": {
+      "container": "relative border-2 border-dashed border-slate-300 rounded-xl bg-slate-50 p-12 text-center hover:bg-blue-50 hover:border-blue-400 transition-colors cursor-pointer group",
+      "icon": "w-12 h-12 text-slate-400 group-hover:text-blue-500 mx-auto mb-4 transition-colors",
+      "text_primary": "text-lg font-medium text-slate-700 mb-1",
+      "text_secondary": "text-sm text-slate-500",
+      "formats": "mt-4 flex items-center justify-center gap-2",
+      "format_badge": "px-2 py-1 bg-white border border-slate-200 rounded text-xs font-mono text-slate-600 shadow-sm"
+    },
+    "inputs": {
+      "text_area": "w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 resize-none",
+      "text_field": "w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+    },
+    "output_display": {
+      "container": "bg-slate-900 rounded-xl p-6 shadow-inner relative overflow-hidden",
+      "text": "font-mono text-sm text-emerald-400 leading-relaxed",
+      "header_bar": "flex items-center justify-between border-b border-slate-700 pb-3 mb-4",
+      "copy_button": "p-2 rounded-md hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+    },
+    "history_panel": {
+      "item": "flex items-start gap-4 p-4 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition-colors",
+      "timestamp": "text-xs text-slate-400 font-mono",
+      "preview": "text-sm text-slate-700 line-clamp-2"
     }
   },
   "visual_enhancers": {
-    "shadows": {
-      "subtle": "shadow-[0_2px_10px_rgba(0,0,0,0.02)]",
-      "glow": "shadow-[0_0_30px_rgba(67,56,202,0.15)]"
+    "background_texture": "Subtle grid pattern or radial gradient meshes using pure white and very light slate (e.g., bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-50 via-white to-white) for marketing pages to prevent flatness.",
+    "glassmorphism": "Used strictly for the top sticky navigation header and overlapping floating stat cards on the hero section. Requires 1px inner border of white/40 to pop.",
+    "shadows": "Ambient diffuse shadows for marketing (shadow-[0_8px_30px_rgb(0,0,0,0.04)]). Crisp, small shadows for dashboard elements (shadow-sm).",
+    "icons": "Lucide React icons with stroke-width 1.5. Essential icons: UploadCloud, Network, Microsope, FileText, Activity, Database, History, LayoutDashboard, Copy, CheckCircle."
+  },
+  "image_urls": [
+    {
+      "category": "hero_visual",
+      "url": "https://images.unsplash.com/photo-1773984203485-8ac6e4ddadfa?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NjZ8MHwxfHNlYXJjaHwzfHwzZCUyMG1vbGVjdWxlJTIwcGhhcm1hY2V1dGljYWwlMjBkcnVnfGVufDB8fHx8MTc3NTc4ODg0NXww&ixlib=rb-4.1.0&q=85",
+      "description": "Abstract blue and white organic molecular structure. Used in the Hero Section to immediately establish the advanced pharmaceutical AI aesthetic."
     },
-    "effects": {
-      "tracing_beam": "Use framer-motion to create a subtle moving border on the main 'Demo Generation' card to indicate AI processing.",
-      "glass_header": "Use glassmorphism (bg-white/80 backdrop-blur-xl border-b border-slate-200/50) for the sticky nav."
+    {
+      "category": "feature_background_1",
+      "url": "https://images.unsplash.com/photo-1637625854255-d893202554f4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MDV8MHwxfHNlYXJjaHwyfHxjbGVhbiUyMG1vZGVybiUyMGFic3RyYWN0JTIwd2hpdGUlMjBsdXh1cnklMjBiYWNrZ3JvdW5kfGVufDB8fHx8MTc3NTc4ODg0NXww&ixlib=rb-4.1.0&q=85",
+      "description": "Abstract white background with vertical lines. Use as a background for the 'How It Works' or 'Features' bento grid container to add depth."
+    },
+    {
+      "category": "auth_background",
+      "url": "https://images.unsplash.com/photo-1644088379091-d574269d422f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njl8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMG1lZGljYWwlMjBuZXR3b3JrJTIwZ3JhcGh8ZW58MHx8fHwxNzc1Nzg4ODQ1fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Blue background with lines and dots representing a knowledge graph. Use as the side-panel image in the Authentication (Login/Signup) split layout."
+    },
+    {
+      "category": "testimonial_researcher",
+      "url": "https://images.unsplash.com/photo-1631556760585-2e846196d5a9?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzN8MHwxfHNlYXJjaHwzfHxtZWRpY2FsJTIwcmVzZWFyY2hlciUyMGxhYm9yYXRvcnklMjBzY2llbnRpc3R8ZW58MHx8fHwxNzc1Nzg4ODM5fDA&ixlib=rb-4.1.0&q=85",
+      "description": "Woman looking through a microscope in a lab. Use in a trust/testimonial section or 'Built for Researchers' block."
     }
+  ],
+  "accessibility_and_interactions": {
+    "hover_states": "All buttons and interactive cards must have distinct hover states (transform -translate-y-0.5 and increased shadow for cards, bg darkening for buttons).",
+    "focus_states": "Form inputs must have a clear 2px focus ring using the primary blue color.",
+    "contrast": "Text contrast must meet WCAG AA. Slate-500 minimum for small text, Slate-600/900 for body/headers.",
+    "testing": "All interactive elements must include data-testid attributes (e.g., data-testid='upload-kg-dropzone', data-testid='generate-text-button', data-testid='copy-output-btn')."
   },
-  "design_rules": {
-    "general": [
-      "No Inter or generic fonts for headings. Use Outfit.",
-      "Do not center-align everything. Use asymmetry.",
-      "All containers with borders must have generous padding (p-6 or p-8).",
-      "Avoid 'SaaS Blue' defaults. Stick to the Indigo/Slate strict palette."
-    ],
-    "accessibility": [
-      "Ensure text contrast meets APCA/WCAG standards.",
-      "All interactive elements must have focus states: focus:ring-2 focus:ring-indigo-500/20.",
-      "MUST add data-testid to all buttons, inputs, links, and key metric cards."
-    ],
-    "motion": [
-      "Use smooth fade-up animations for page loads.",
-      "Add micro-interactions to dashboard widgets (slight lift and shadow on hover)."
-    ]
-  },
-  "media": {
-    "images": [
-      {
-        "category": "hero_background",
-        "url": "https://images.unsplash.com/photo-1760442903458-664c65a88b8a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NjZ8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGJsdWUlMjBncmFkaWVudCUyMG1vZGVybnxlbnwwfHx8fDE3NzU3ODU3MTV8MA&ixlib=rb-4.1.0&q=85",
-        "description": "Abstract diagonal streaks of blue/purple to use as a subtle, low-opacity background behind the hero section."
-      },
-      {
-        "category": "feature_ai",
-        "url": "https://images.unsplash.com/photo-1674027215032-f0c4292318ee?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NDh8MHwxfHNlYXJjaHwxfHxiaW9tZWRpY2FsJTIwdGVjaG5vbG9neSUyMGFpfGVufDB8fHx8MTc3NTc4NTcxNXww&ixlib=rb-4.1.0&q=85",
-        "description": "Computer-generated AI concept image for the features section."
-      },
-      {
-        "category": "avatar_user",
-        "url": "https://images.unsplash.com/photo-1633625510483-c177f4308f33?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNTl8MHwxfHNlYXJjaHwyfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdCUyMGF2YXRhcnxlbnwwfHx8fDE3NzU3ODU3MTB8MA&ixlib=rb-4.1.0&q=85",
-        "description": "Professional smiling man avatar to use alongside the 'Welcome Sai!' message."
-      },
-      {
-        "category": "avatar_admin",
-        "url": "https://images.unsplash.com/photo-1609371497456-3a55a205d5eb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNTl8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdCUyMGF2YXRhcnxlbnwwfHx8fDE3NzU3ODU3MTB8MA&ixlib=rb-4.1.0&q=85",
-        "description": "Female professional avatar for admin or alternate user profiles."
-      },
-      {
-        "category": "partner_logo_1",
-        "url": "https://images.unsplash.com/photo-1648200076219-bc83229919ca?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzOTB8MHwxfHNlYXJjaHwxfHx0ZWNoJTIwY29tcGFueSUyMGxvZ28lMjB3aGl0ZSUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzc1Nzg1NzExfDA&ixlib=rb-4.1.0&q=85",
-        "description": "Tech integration/partner logo placeholder (abstract)."
-      }
-    ],
-    "icons_library": "lucide-react"
-  },
-  "specific_instructions": {
-    "landing_page": "Use the hero_background image with a heavy white gradient overlay (e.g. bg-white/90) so the abstract blue streaks subtly peek through. The hero text should be bold Outfit H1. Add a 'Try the Demo' CTA.",
-    "dashboard": "Create a 'Control Room' bento grid. Incorporate a personalized header 'Welcome Sai!' with the avatar_user image. Display stats cards (e.g., 'Generations This Week', 'API Calls'). Include a service-related quote in an empty state or sidebar: 'Translating data into discovery, one triple at a time.'",
-    "kg_generation_panel": "Split view: Left side is a textarea using the 'textarea_mono' style for KG Triples. Right side is an output card for the generated natural language. Add a 'Generate' button with the 'primary' button style. Use a skeleton loader with a subtle indigo pulse during generation.",
-    "testing": "Ensure all interactive elements have valid data-testid attributes."
-  }
+  "instructions_to_main_agent": [
+    "Build the application strictly using standard React + Tailwind CSS + Shadcn components.",
+    "Implement the 'BioKG Text AI' title explicitly with the 'font-black' class from Cabinet Grotesk (or substitute with your boldest available sans-serif if not installed, but tracking must be tight).",
+    "For the KG-to-Text generation section, include a split or tabbed interface allowing users to either paste raw text or use the drag-and-drop file upload zone (must clearly mention CSV, JSON, TTL formats in the UI).",
+    "Replace generic demo text with professional pharmaceutical/AI copy (e.g., 'Synthesizing knowledge graph triples into natural language clinical insights...').",
+    "Implement the user dashboard and admin analytics with dense, data-rich 'Control Room' grid layouts (grid-cols-1 md:grid-cols-3 or 4) utilizing Shadcn cards and Recharts if necessary.",
+    "Ensure the hero section uses the provided 'hero_visual' image creatively (e.g., inside a beautifully rounded container with a subtle shadow, or overlapping the layout)."
+  ]
 }
