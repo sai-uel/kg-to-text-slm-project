@@ -1,0 +1,142 @@
+{
+  "theme": "Light",
+  "archetype": "Archetype 4 (Swiss & High-Contrast) adapted for Enterprise SaaS",
+  "colors": {
+    "background": {
+      "default": "#FFFFFF",
+      "muted": "#F8FAFC",
+      "surface": "#FFFFFF",
+      "glass": "rgba(255, 255, 255, 0.7)"
+    },
+    "primary": {
+      "default": "#4338CA",
+      "hover": "#3730A3",
+      "light": "#EEF2FF",
+      "glow": "rgba(67, 56, 202, 0.4)"
+    },
+    "secondary": {
+      "default": "#3B82F6",
+      "hover": "#2563EB",
+      "light": "#DBEAFE"
+    },
+    "text": {
+      "primary": "#0F172A",
+      "secondary": "#475569",
+      "muted": "#94A3B8",
+      "inverse": "#FFFFFF",
+      "accent": "#4338CA"
+    },
+    "border": {
+      "default": "#E2E8F0",
+      "focus": "#4338CA",
+      "glass": "rgba(255, 255, 255, 0.4)"
+    },
+    "feedback": {
+      "success": "#10B981",
+      "error": "#EF4444",
+      "warning": "#F59E0B"
+    }
+  },
+  "typography": {
+    "fonts": {
+      "heading": "'Outfit', sans-serif",
+      "body": "'Manrope', sans-serif",
+      "mono": "'JetBrains Mono', monospace"
+    },
+    "scales": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl tracking-tight leading-none font-bold",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl tracking-tight font-semibold",
+      "h3": "text-xl sm:text-2xl tracking-tight font-medium",
+      "body": "text-base leading-relaxed",
+      "small": "text-sm leading-normal",
+      "overline": "text-xs tracking-[0.2em] uppercase font-bold text-slate-500"
+    }
+  },
+  "components": {
+    "button": {
+      "primary": "bg-indigo-600 text-white font-semibold rounded-lg shadow-sm hover:bg-indigo-700 hover:shadow-[0_0_20px_rgba(67,56,202,0.3)] hover:text-indigo-50 transition-all duration-300 px-6 py-3",
+      "secondary": "bg-white text-slate-700 font-medium border border-slate-200 rounded-lg hover:border-indigo-300 hover:bg-slate-50 hover:text-indigo-700 transition-all duration-300 px-6 py-3",
+      "ghost": "text-slate-600 font-medium hover:bg-slate-100 hover:text-slate-900 rounded-lg transition-colors px-4 py-2"
+    },
+    "card": {
+      "default": "bg-white rounded-xl border border-slate-200 shadow-sm",
+      "interactive": "bg-white rounded-xl border border-slate-200 shadow-sm hover:-translate-y-1 hover:shadow-md hover:border-indigo-200 transition-all duration-300",
+      "glass": "bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)] rounded-xl"
+    },
+    "input": {
+      "default": "w-full bg-white border border-slate-300 text-slate-900 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all",
+      "textarea_mono": "w-full bg-slate-50 border border-slate-200 font-mono text-sm text-slate-800 rounded-lg p-4 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all shadow-inner"
+    }
+  },
+  "layout": {
+    "spacing": {
+      "section_y": "py-24 md:py-32",
+      "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+      "gap_bento": "gap-4 md:gap-6",
+      "gap_features": "gap-12 md:gap-16"
+    }
+  },
+  "visual_enhancers": {
+    "shadows": {
+      "subtle": "shadow-[0_2px_10px_rgba(0,0,0,0.02)]",
+      "glow": "shadow-[0_0_30px_rgba(67,56,202,0.15)]"
+    },
+    "effects": {
+      "tracing_beam": "Use framer-motion to create a subtle moving border on the main 'Demo Generation' card to indicate AI processing.",
+      "glass_header": "Use glassmorphism (bg-white/80 backdrop-blur-xl border-b border-slate-200/50) for the sticky nav."
+    }
+  },
+  "design_rules": {
+    "general": [
+      "No Inter or generic fonts for headings. Use Outfit.",
+      "Do not center-align everything. Use asymmetry.",
+      "All containers with borders must have generous padding (p-6 or p-8).",
+      "Avoid 'SaaS Blue' defaults. Stick to the Indigo/Slate strict palette."
+    ],
+    "accessibility": [
+      "Ensure text contrast meets APCA/WCAG standards.",
+      "All interactive elements must have focus states: focus:ring-2 focus:ring-indigo-500/20.",
+      "MUST add data-testid to all buttons, inputs, links, and key metric cards."
+    ],
+    "motion": [
+      "Use smooth fade-up animations for page loads.",
+      "Add micro-interactions to dashboard widgets (slight lift and shadow on hover)."
+    ]
+  },
+  "media": {
+    "images": [
+      {
+        "category": "hero_background",
+        "url": "https://images.unsplash.com/photo-1760442903458-664c65a88b8a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NjZ8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGJsdWUlMjBncmFkaWVudCUyMG1vZGVybnxlbnwwfHx8fDE3NzU3ODU3MTV8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract diagonal streaks of blue/purple to use as a subtle, low-opacity background behind the hero section."
+      },
+      {
+        "category": "feature_ai",
+        "url": "https://images.unsplash.com/photo-1674027215032-f0c4292318ee?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NDh8MHwxfHNlYXJjaHwxfHxiaW9tZWRpY2FsJTIwdGVjaG5vbG9neSUyMGFpfGVufDB8fHx8MTc3NTc4NTcxNXww&ixlib=rb-4.1.0&q=85",
+        "description": "Computer-generated AI concept image for the features section."
+      },
+      {
+        "category": "avatar_user",
+        "url": "https://images.unsplash.com/photo-1633625510483-c177f4308f33?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNTl8MHwxfHNlYXJjaHwyfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdCUyMGF2YXRhcnxlbnwwfHx8fDE3NzU3ODU3MTB8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Professional smiling man avatar to use alongside the 'Welcome Sai!' message."
+      },
+      {
+        "category": "avatar_admin",
+        "url": "https://images.unsplash.com/photo-1609371497456-3a55a205d5eb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNTl8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdCUyMGF2YXRhcnxlbnwwfHx8fDE3NzU3ODU3MTB8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Female professional avatar for admin or alternate user profiles."
+      },
+      {
+        "category": "partner_logo_1",
+        "url": "https://images.unsplash.com/photo-1648200076219-bc83229919ca?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzOTB8MHwxfHNlYXJjaHwxfHx0ZWNoJTIwY29tcGFueSUyMGxvZ28lMjB3aGl0ZSUyMGJhY2tncm91bmR8ZW58MHx8fHwxNzc1Nzg1NzExfDA&ixlib=rb-4.1.0&q=85",
+        "description": "Tech integration/partner logo placeholder (abstract)."
+      }
+    ],
+    "icons_library": "lucide-react"
+  },
+  "specific_instructions": {
+    "landing_page": "Use the hero_background image with a heavy white gradient overlay (e.g. bg-white/90) so the abstract blue streaks subtly peek through. The hero text should be bold Outfit H1. Add a 'Try the Demo' CTA.",
+    "dashboard": "Create a 'Control Room' bento grid. Incorporate a personalized header 'Welcome Sai!' with the avatar_user image. Display stats cards (e.g., 'Generations This Week', 'API Calls'). Include a service-related quote in an empty state or sidebar: 'Translating data into discovery, one triple at a time.'",
+    "kg_generation_panel": "Split view: Left side is a textarea using the 'textarea_mono' style for KG Triples. Right side is an output card for the generated natural language. Add a 'Generate' button with the 'primary' button style. Use a skeleton loader with a subtle indigo pulse during generation.",
+    "testing": "Ensure all interactive elements have valid data-testid attributes."
+  }
+}
