@@ -1,0 +1,7 @@
+metric_key,Metric,LoRA,QLoRA
+avg_fact_precision,Avg Fact Precision,0.99462879640045,0.99462879640045
+avg_fact_recall,Avg Fact Recall,0.999437570303712,0.999437570303712
+avg_fact_f1,Avg Fact F1,0.99663623777797,0.99663623777797
+avg_hallucination_rate,Avg Hallucination Rate,0.00537120359955,0.00537120359955
+exact_match_rate,Exact Match Rate,0.2677165354330709,0.2716535433070866
+exact_match_count,Exact Match Count,68.0,69.0
