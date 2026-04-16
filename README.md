@@ -219,13 +219,19 @@ Additional checks
 # LoRA Results
 
 BLEU: 0.9737
+
 ROUGE-1: 0.9938
+
 ROUGE-2: 0.9802
+
 ROUGE-L: 0.8574
+
 BERTScore F1: 0.9896
 
 Fact Precision: 0.9946
+
 Fact Recall: 0.9994
+
 Fact F1: 0.9966
 
 Hallucination Rate: 0.00537
@@ -235,13 +241,19 @@ Exact Match Rate: 0.2677
 # QLoRA Results
 
 BLEU: 0.9764
+
 ROUGE-1: 0.9947
+
 ROUGE-2: 0.9809
+
 ROUGE-L: 0.8603
+
 BERTScore F1: 0.9901
 
 Fact Precision: 0.9946
+
 Fact Recall: 0.9994
+
 Fact F1: 0.9966
 
 Hallucination Rate: 0.00537
@@ -249,6 +261,20 @@ Hallucination Rate: 0.00537
 Exact Match Rate: 0.2717
 
 # Model Comparison
+
+| Metric | LoRA | QLoRA |
+|------|------|------|
+| Training Loss | 0.03548 | 0.03576 |
+| BLEU | 0.9737 | 0.9764 |
+| ROUGE-1 | 0.9938 | 0.9947 |
+| ROUGE-2 | 0.9802 | 0.9809 |
+| ROUGE-L | 0.8574 | 0.8603 |
+| BERTScore F1 | 0.9896 | 0.9901 |
+| Fact Precision | 0.9946 | 0.9946 |
+| Fact Recall | 0.9994 | 0.9994 |
+| Fact F1 | 0.9966 | 0.9966 |
+| Hallucination Rate | 0.00537 | 0.00537 |
+| Exact Match Rate | 0.2677 | 0.2717 |
 
 Both LoRA and QLoRA achieved very strong performance with minimal differences.
 
@@ -267,8 +293,11 @@ because of slightly more stable optimization behavior.
 https://huggingface.co/datasets/BSVGK/drugbank_dataset
 
 Contains:
+
 	•	KG-to-Text dataset
+	
 	•	train / validation / test splits
+	
 	•	instruction formatted samples
 
 ## LoRA Adapter Model
@@ -290,7 +319,9 @@ Gradio Demo
 Used for interactive model testing.
 
 Features:
+
 	•	input RDF triples
+	
 	•	generate natural language output
 
 # Local Web Deployment
@@ -307,12 +338,20 @@ Architecture:
 User → React UI → FastAPI → Gemma Model → Generated Text
 
 # Limitations
-The model was trained on a limited set of RDF predicates from the DrugBank ontology, which may restrict generalization to other knowledge graph schemas.
+•	The model was trained on a limited set of RDF predicates from the DrugBank ontology, which may restrict generalization to other   knowledge graph schemas.
+
 	•	Most training samples contain a similar number of triples (around 13–17), so the model has limited exposure to cases with very small or very large triple sets.
+	
 	•	The dataset follows a relatively consistent output paragraph structure, which may lead the model to generate similar sentence patterns.
+	
 	•	The training data uses fixed triple ordering in many samples, which may introduce ordering bias in generated text.
+	
 	•	The dataset size (~2537 samples) is relatively small for training large language models, which may limit robustness.
+	
 	•	The project is focused on a single domain (DrugBank pharmaceutical data), so performance on other domains has not been evaluated.
+	
+	•	The model evaluation primarily relies on automated metrics, and extensive human evaluation by domain experts was not conducted.
+	
 	•	Some minor hallucinations may still occur, even though the hallucination rate is very low.
 
 # Future Work
@@ -326,14 +365,19 @@ The model was trained on a limited set of RDF predicates from the DrugBank ontol
 # Acknowledgements
 
 University of East London
+
 Depixen Collaboration
+
 DrugBank
+
 Hugging Face
+
 Google Gemma
 
 # License
 
 Dataset access governed by DrugBank research license.
+
 Code provided for academic research purposes.
 
 
