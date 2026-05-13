@@ -440,86 +440,118 @@ async def refresh_token(request: Request, response: Response):
     except jwt.InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-# ==================== GENERATION ROUTES ====================
+# ===================== GENERATION ROUTES =====================
 
 @generate_router.post("", response_model=GenerateResponse)
 async def generate_text(data: GenerateRequest, request: Request):
-    """Generate natural language from knowledge graph triples using local Gemma + LoRA model"""
+    """Generate natural language from knowledge graph triples using the merged fine-tuned KG model."""
     start_time = time.time()
 
-    prompt = f"""<start_of_turn>user
-Convert the following drug knowledge graph triples into a clear and complete natural language description.
+    triples_text = (data.triples or "").strip()
+    if not triples_text:
+        raise HTTPException(status_code=400, detail="No triples were provided.")
 
-{data.triples}<end_of_turn>
+    prompt = f"""<start_of_turn>user
+You are DrugKG Text AI, a grounded biomedical knowledge graph to text generation system.
+
+Task:
+Convert the following DrugBank-style knowledge graph triples into a clear, complete, and accurate natural language description.
+
+Rules:
+- Use only the information present in the triples.
+- Do not invent any facts.
+- Keep the output fluent, grounded, and domain-focused.
+- Produce the best complete answer directly.
+
+Triples:
+{triples_text}<end_of_turn>
 <start_of_turn>model
 """
 
     try:
         generated_text = generate_with_model(
             prompt=prompt,
-            max_new_tokens=300,
-            temperature=0.3
+            max_new_tokens=260,
+            min_new_tokens=60,
+            temperature=0.0,
+            top_p=0.95,
+            repetition_penalty=1.08,
+            stop_at_end_turn=True
         )
+
+        generated_text = (generated_text or "").strip()
+        if not generated_text:
+            generated_text = "No text was generated. Please try clearer or better-structured triples."
 
         latency_ms = int((time.time() - start_time) * 1000)
 
         return GenerateResponse(
             generated_text=generated_text,
             latency_ms=latency_ms,
-            input_length=len(data.triples)
+            input_length=len(triples_text)
         )
 
     except Exception as e:
-        logger.error(f"Generation error: {str(e)}")
+        logger.exception("Generation error")
         raise HTTPException(status_code=500, detail=f"Generation failed: {str(e)}")
-
-# ==================== CHAT ROUTES ====================
+# ===================== CHAT ROUTES =====================
 
 @chat_router.post("", response_model=ChatResponse)
 async def chat_with_ai(data: ChatRequest):
-    """Chat with the DrugKG AI Assistant using local Gemma + LoRA model"""
-
+    """General chat assistant route using a general assistant prompt."""
     try:
+        user_message = (data.message or "").strip()
+        if not user_message:
+            raise HTTPException(status_code=400, detail="Empty chat message.")
+
         history_text = ""
-        for msg in data.history[-4:]:
-            if msg.role == "user":
-                history_text += f"<start_of_turn>user\n{msg.content}<end_of_turn>\n"
+        for msg in (data.history or [])[-6:]:
+            role = getattr(msg, "role", None)
+            content = (getattr(msg, "content", "") or "").strip()
+
+            if not content:
+                continue
+
+            if role == "user":
+                history_text += f"<start_of_turn>user\n{content}<end_of_turn>\n"
             else:
-                history_text += f"<start_of_turn>model\n{msg.content}<end_of_turn>\n"
+                history_text += f"<start_of_turn>model\n{content}<end_of_turn>\n"
 
         prompt = f"""<start_of_turn>user
-You are DrugKG AI Assistant, an expert in pharmaceutical knowledge and DrugBank-related information.
+You are DrugKG Text AI Assistant.
 
-You specialize in:
-- Drug interactions and mechanisms of action
-- Converting knowledge graph triples to natural language
-- Explaining drug properties, indications, and contraindications
-- DrugBank database information
+You are a helpful AI assistant with biomedical knowledge.
 
-Be accurate, concise, and domain-focused.
-If a question is outside pharmaceutical or biomedical topics, say that your scope is limited.
-If you do not know something, say so instead of making up information.<end_of_turn>
-{history_text}<start_of_turn>user
-{data.message}<end_of_turn>
+Rules:
+- Answer clearly and naturally.
+- Do not start responses with words like "Understood".
+- If you do not know the answer, say so honestly.
+- Avoid inventing database identifiers or citations.
+
+{history_text}<end_of_turn>
+<start_of_turn>user
+{user_message}<end_of_turn>
 <start_of_turn>model
 """
 
         response_text = generate_with_model(
             prompt=prompt,
-            max_new_tokens=220,
-            temperature=0.5
+            max_new_tokens=300,
+            temperature=0.7,
+            top_p=0.9,
+            repetition_penalty=1.05,
+            
         )
 
+        response_text = (response_text or "").strip()
         if not response_text:
             response_text = "I apologize, I couldn't generate a response. Please try again."
 
         return ChatResponse(response=response_text)
 
     except Exception as e:
-        logger.error(f"Chat error: {str(e)}")
-        return ChatResponse(
-            response="I encountered an issue processing your request. Please try again or use the Generate feature for knowledge graph transformations."
-        )
+        logger.exception("Chat error")
+        raise HTTPException(status_code=500, detail=f"Chat failed: {str(e)}")
 
 # ==================== GENERATIONS (SAVED) ROUTES ====================
 
