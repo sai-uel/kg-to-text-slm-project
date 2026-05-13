@@ -1,0 +1,4 @@
+metric_key,Metric,LoRA,QLoRA
+avg_prediction_token_length,Avg Prediction Token Length,223.81102362204723,223.3503937007874
+avg_reference_token_length,Avg Reference Token Length,221.61811023622047,221.61811023622047
+prediction_reference_length_ratio,Prediction / Reference Length Ratio,1.00989500985948,1.0078165248441135
