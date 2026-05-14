@@ -89,3 +89,5 @@ frontend.zip
 backend/.env
 backend/.env
 backend/.env*
+backend/.env
+backend/.env*
