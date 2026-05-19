@@ -235,7 +235,7 @@ All models and datasets are **publicly accessible** — no access request requir
 | Emmanuel Enotobore | Demo & Integration Lead |
 
 **Line Manager:** Ugur Acar, Chief AI Officer, Depixen  
-**Supervisor:** Yalcin, Depixen  
+**Supervisor:** Yalcin Cenik,AI Engineer, Depixen  
 **Placement Lead:** Dr Ali Abbas, University of East London  
 **Placement Period:** 26 January – 20 May 2026
 
